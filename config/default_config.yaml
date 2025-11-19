@@ -1,0 +1,72 @@
+# Default Configuration for SPGG Experiments
+# This file defines default parameters for the Spatial Public Goods Game experiments
+
+# Model Parameters
+model:
+  r: 3.0                    # Multiplication factor for public goods
+  c: 1.0                    # Contribution amount
+  cost: 1.0                 # Cost of cooperation
+  L: 100                    # Lattice size (L x L)
+  iterations: 20001         # Number of iterations
+  num_of_strategies: 2      # Number of strategies (cooperate/defect)
+  K: 0.1                    # Selection strength
+  population_type: 0        # Population initialization type
+
+# Reinforcement Learning Parameters
+rl:
+  alpha: 0.8                # Learning rate
+  gamma: 0.9                # Discount factor
+  epsilon: 0.5              # Initial exploration rate
+  epsilon_decay: 0.99       # Epsilon decay rate per iteration
+  epsilon_min: 0.01         # Minimum epsilon value
+  state_representation: "reputation"  # State representation: "reputation" or "action"
+
+# Neighbor Influence Parameters
+neighbor_influence:
+  influence_factor: 1.0      # Strength of neighbor influence (kappa)
+  use_second_order: true    # Whether to use second-order neighbors (M=2)
+  lambda_epsilon: 0.01      # Small epsilon for lambda calculation
+
+# Reputation Parameters
+reputation:
+  delta_R_C: 1.0            # Reputation gain for cooperation
+  delta_R_D: 1.0            # Reputation loss for defection
+  R_min: -10                # Minimum reputation value
+  R_max: 10                 # Maximum reputation value
+  rep_gain_C: 1.0           # Reputation gain coefficient
+
+# Reward Structure
+reward:
+  reward_weight_payoff: 0.95 # Weight for payoff component (w_P)
+  # reward_weight_rep is automatically set to 1 - reward_weight_payoff
+
+# Experiment Parameters
+experiments:
+  # Parameter sweeps for different figures
+  figure_2_3_4:
+    r: 3.6
+    kappas: [0.0, 0.5, 1.0, 1.5, 2.0]
+    use_second_order: [false, true]
+    reward_weight_payoff: 1.0
+  
+  figure_6_7_8_9:
+    r: 3.0
+    # Sole Reputation: kappa=0, w_P=0.95
+    # Sole NI: kappa>0, w_P=1.0
+    # Hybrid: kappa>0, w_P=0.95
+    use_second_order: [false, true]
+  
+  # Custom parameter combinations
+  custom:
+    r_values: [1.0, 2.0, 3.0, 4.0, 5.0]
+    kappa_values: [0.0, 0.5, 1.0, 1.5, 2.0]
+    use_second_order: [false, true]
+    reward_weight_payoff_values: [0.83, 0.95, 1.0]
+
+# Output Settings
+output:
+  base_dir: "results"
+  save_snapshots: true
+  snapshot_iterations: [1, 10, 100, 1000, 5000, 10000, 20000, 30000, 40000]
+  save_plots: true
+
