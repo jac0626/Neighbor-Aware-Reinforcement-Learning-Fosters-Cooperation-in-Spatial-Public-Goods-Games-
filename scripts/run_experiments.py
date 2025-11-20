@@ -39,8 +39,15 @@ def main():
     print(f"Total parameter combinations: {len(param_combinations)}")
     print("Parameters to run:")
     for params in param_combinations[:10]:  # Show first 10
-        r, kappa, use_so, alpha, w_P, rep_gain_C = params
-        print(f"  - r={r}, κ={kappa}, M={2 if use_so else 1}, α={alpha}, w_P={w_P}, ΔR_C={rep_gain_C}")
+        if len(params) == 7:
+            r, kappa, use_so, alpha, w_P, rep_gain_C, state_rep = params
+        elif len(params) == 6:
+            r, kappa, use_so, alpha, w_P, rep_gain_C = params
+            state_rep = None
+        else:
+            raise ValueError(f"Unexpected parameter format: {params}")
+        rep_info = f", state={state_rep}" if state_rep is not None else ""
+        print(f"  - r={r}, κ={kappa}, M={2 if use_so else 1}, α={alpha}, w_P={w_P}, ΔR_C={rep_gain_C}{rep_info}")
     if len(param_combinations) > 10:
         print(f"  ... and {len(param_combinations) - 10} more")
     
