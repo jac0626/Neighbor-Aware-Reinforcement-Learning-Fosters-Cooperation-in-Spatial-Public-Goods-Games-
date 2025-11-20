@@ -1,0 +1,52 @@
+name: Run SPGG Experiments
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  experiments:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run experiments for Figures 2–4
+        run: python scripts/run_experiments.py --experiment-type figure_2_3_4 --num-processes 2 --no-progress
+
+      - name: Run experiments for Figures 6–9
+        run: python scripts/run_experiments.py --experiment-type figure_6_7_8_9 --num-processes 2 --no-progress
+
+      - name: Generate publication figures
+        run: python scripts/plot_figures.py --data-dir . --output-dir paper_figures --figures all
+
+      - name: Upload figures
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper-figures
+          path: paper_figures
+          if-no-files-found: error
+
+      - name: Upload raw experiment outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: raw-experiment-results
+          path: |
+            results_r*
+          if-no-files-found: warn
+

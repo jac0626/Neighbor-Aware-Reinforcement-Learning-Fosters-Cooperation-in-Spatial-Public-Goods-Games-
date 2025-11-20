@@ -148,6 +148,7 @@ def get_model_params(config: Dict[str, Any], **overrides) -> Dict[str, Any]:
         'iterations': model_config.get('iterations', 1000),
         'num_of_strategies': model_config.get('num_of_strategies', 2),
         'population_type': model_config.get('population_type', 0),
+        'algorithm': rl_config.get('algorithm', 'qlearning'),
         'alpha': rl_config.get('alpha', 0.1),
         'gamma': rl_config.get('gamma', 0.9),
         'epsilon': rl_config.get('epsilon', 0.5),

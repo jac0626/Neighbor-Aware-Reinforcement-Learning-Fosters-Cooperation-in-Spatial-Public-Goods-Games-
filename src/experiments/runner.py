@@ -10,7 +10,8 @@ from ..model import SPGG
 
 def get_folder_name(r: float, kappa: float, use_second_order: bool, 
                    alpha: float, reward_weight_payoff: float, rep_gain_C: float,
-                   state_representation: str = 'reputation') -> str:
+                   state_representation: str = 'reputation', 
+                   algorithm: str = 'qlearning') -> str:
     """
     Generate folder name from parameters
     
@@ -30,6 +31,8 @@ def get_folder_name(r: float, kappa: float, use_second_order: bool,
         Reputation gain for cooperation
     state_representation : str
         State representation method ('reputation' or 'action')
+    algorithm : str
+        RL algorithm name
         
     Returns:
     --------
@@ -37,8 +40,9 @@ def get_folder_name(r: float, kappa: float, use_second_order: bool,
     """
     order_str = str(use_second_order)
     state_suffix = "_action" if state_representation == 'action' else ""
+    algo_suffix = f"_{algorithm}" if algorithm != 'qlearning' else ""
     return (f"results_r{r}_inf{kappa}_order{order_str}_alpha{alpha}_"
-            f"rw{reward_weight_payoff:.2f}_rgC{rep_gain_C:.2f}{state_suffix}")
+            f"rw{reward_weight_payoff:.2f}_rgC{rep_gain_C:.2f}{state_suffix}{algo_suffix}")
 
 
 def run_one_experiment(params: Tuple) -> Tuple[Tuple, Tuple[float, float]]:
@@ -48,22 +52,28 @@ def run_one_experiment(params: Tuple) -> Tuple[Tuple, Tuple[float, float]]:
     Parameters:
     -----------
     params : tuple
-        (r, kappa, use_second_order, alpha, reward_weight_payoff, rep_gain_C, state_representation)
+        (r, kappa, use_second_order, alpha, reward_weight_payoff, rep_gain_C, state_representation, algorithm)
+        or (r, kappa, use_second_order, alpha, reward_weight_payoff, rep_gain_C, state_representation)
         or (r, kappa, use_second_order, alpha, reward_weight_payoff, rep_gain_C) for backward compatibility
         
     Returns:
     --------
     tuple : (params, (final_coop_ratio, final_rep_mean))
     """
-    # Handle both old (6 params) and new (7 params) formats
-    if len(params) == 7:
+    # Handle different parameter formats for backward compatibility
+    if len(params) == 8:
+        r_val, influence_factor, use_second_order, alpha_val, reward_weight_payoff, rep_gain_C, state_representation, algorithm = params
+    elif len(params) == 7:
         r_val, influence_factor, use_second_order, alpha_val, reward_weight_payoff, rep_gain_C, state_representation = params
+        algorithm = 'qlearning'  # Default algorithm
     else:
         r_val, influence_factor, use_second_order, alpha_val, reward_weight_payoff, rep_gain_C = params
         state_representation = 'reputation'  # Default for backward compatibility
+        algorithm = 'qlearning'  # Default algorithm
     
     folder_name = get_folder_name(r_val, influence_factor, use_second_order, 
-                                  alpha_val, reward_weight_payoff, rep_gain_C, state_representation)
+                                  alpha_val, reward_weight_payoff, rep_gain_C, 
+                                  state_representation, algorithm)
     
     # Create directory structure
     if not os.path.exists(folder_name):
@@ -86,7 +96,8 @@ def run_one_experiment(params: Tuple) -> Tuple[Tuple, Tuple[float, float]]:
         delta_R_C=1, delta_R_D=1, R_min=-10, R_max=10,
         reward_weight_payoff=reward_weight_payoff, 
         rep_gain_C=rep_gain_C,
-        state_representation=state_representation
+        state_representation=state_representation,
+        algorithm=algorithm
     )
     spgg.folder = folder_name
     
@@ -98,7 +109,7 @@ def run_one_experiment(params: Tuple) -> Tuple[Tuple, Tuple[float, float]]:
     
     state_label = "action" if state_representation == 'action' else "rep"
     print(f"Done: r={r_val}, κ={influence_factor}, M={2 if use_second_order else 1}, "
-          f"α={alpha_val}, w_P={reward_weight_payoff}, ΔR_C={rep_gain_C}, state={state_label}")
+          f"α={alpha_val}, w_P={reward_weight_payoff}, ΔR_C={rep_gain_C}, state={state_label}, algo={algorithm}")
     
     return params, (final_coop_ratio, final_rep_mean)
 

@@ -14,6 +14,7 @@ model:
 
 # Reinforcement Learning Parameters
 rl:
+  algorithm: "qlearning"    # Algorithm: "qlearning", "sarsa", "expected_sarsa", "double_qlearning"
   alpha: 0.8                # Learning rate
   gamma: 0.9                # Discount factor
   epsilon: 0.5              # Initial exploration rate

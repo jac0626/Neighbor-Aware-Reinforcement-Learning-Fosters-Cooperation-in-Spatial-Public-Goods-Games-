@@ -8,6 +8,7 @@ import matplotlib as mpl
 from matplotlib.colors import LinearSegmentedColormap
 from scipy.ndimage import label
 import h5py
+from .algorithms import create_algorithm, RLAlgorithm
 
 
 # Color map settings
@@ -40,7 +41,7 @@ class SPGG:
     Spatial Public Goods Game with Reinforcement Learning and Reputation Mechanism
     
     This class implements the SPGG model with:
-    - Q-learning for strategy selection
+    - Multiple RL algorithms for strategy selection (Q-learning, SARSA, Expected SARSA, Double Q-learning)
     - Reputation-based state representation
     - Neighbor influence mechanism
     - Support for first-order and second-order neighbors
@@ -52,7 +53,7 @@ class SPGG:
                  epsilon_min=0.01, influence_factor=1.0, use_second_order=True, 
                  lambda_epsilon=0.01, delta_R_C=1, delta_R_D=1, R_min=-10, 
                  R_max=10, reward_weight_payoff=1.0, rep_gain_C=0.5, 
-                 state_representation='reputation', **params):
+                 state_representation='reputation', algorithm='qlearning', **params):
         """
         Initialize SPGG model
         
@@ -90,6 +91,9 @@ class SPGG:
             State representation method: 'reputation' (default) or 'action'
             - 'reputation': State based on average reputation of neighbors
             - 'action': State based on previous action/strategy
+        algorithm : str or RLAlgorithm
+            RL algorithm to use: 'qlearning', 'sarsa', 'expected_sarsa', 'double_qlearning'
+            or an RLAlgorithm instance
         """
         np.random.seed()
         
@@ -103,8 +107,25 @@ class SPGG:
         # Derived parameters
         self.reward_weight_rep = 1 - self.reward_weight_payoff
         
+        # Initialize algorithm
+        if isinstance(algorithm, str):
+            self.algorithm = create_algorithm(
+                algorithm, alpha, gamma, epsilon, epsilon_decay, epsilon_min, **params
+            )
+        elif isinstance(algorithm, RLAlgorithm):
+            self.algorithm = algorithm
+        else:
+            raise ValueError(f"algorithm must be str or RLAlgorithm, got {type(algorithm)}")
+        
         # Initialize Q-table and reputation
         self.q_table = np.random.uniform(low=-0.01, high=0.01, size=(L, L, 2, 2))
+        
+        # For Double Q-learning, initialize two Q-tables
+        if hasattr(self.algorithm, 'initialize_q_tables'):
+            self.algorithm.initialize_q_tables(self.q_table.shape)
+            # Use combined Q-table as main Q-table
+            self.q_table = self.algorithm.get_combined_q_table()
+        
         self.R = np.zeros((L, L))
         
         # Caching and population
@@ -384,13 +405,9 @@ class SPGG:
                 if coop_rate == 0 or coop_rate == 1:
                     break
 
-                # Q-learning and neighbor influence updates
+                # RL algorithm action selection
                 old_states = self.get_reputation_state()
-                explore = np.random.rand(L, L) < self.epsilon
-                q_values = self.q_table[np.arange(L)[:, None], np.arange(L), old_states, :]
-                greedy_actions = np.argmax(q_values, axis=2)
-                random_actions = np.random.randint(0, 2, size=(L, L))
-                actions = np.where(explore, random_actions, greedy_actions)
+                actions = self.algorithm.select_action(self.q_table, old_states, L)
 
                 # Update reputation, strategy, and clear cache
                 self.update_reputation(actions)
@@ -409,13 +426,48 @@ class SPGG:
                 rep_comp_history.append(np.mean(self.reward_weight_rep * rep_reward))
                 rewards = self.reward_weight_payoff * P + self.reward_weight_rep * rep_reward
 
-                # Q-learning update
-                max_next_q = np.max(self.q_table[np.arange(L)[:, None], np.arange(L), new_states, :], axis=2)
+                # Update Q-table using algorithm-specific update rule
+                # For SARSA, need to select next actions before updating
+                from .algorithms import SARSA
+                if isinstance(self.algorithm, SARSA):
+                    # Select next actions for SARSA (on-policy)
+                    next_actions = self.algorithm.select_action(self.q_table, new_states, L)
+                    self.q_table = self.algorithm.update_q_table(
+                        self.q_table, old_states, actions, rewards, new_states,
+                        next_actions=next_actions
+                    )
+                else:
+                    # For other algorithms (Q-learning, Expected SARSA, Double Q-learning)
+                    self.q_table = self.algorithm.update_q_table(
+                        self.q_table, old_states, actions, rewards, new_states
+                    )
+                
+                # Calculate TD error for neighbor influence calculation
                 idx = np.indices((L, L))
                 q_current = self.q_table[idx[0], idx[1], old_states, actions]
-                td_error = rewards + self.gamma * max_next_q - q_current
+                
+                from .algorithms import SARSA, ExpectedSARSA
+                if isinstance(self.algorithm, SARSA):
+                    # SARSA uses next action's Q-value
+                    next_actions = self.algorithm.select_action(self.q_table, new_states, L)
+                    next_q = self.q_table[idx[0], idx[1], new_states, next_actions]
+                    td_error = rewards + self.gamma * next_q - q_current
+                elif isinstance(self.algorithm, ExpectedSARSA):
+                    # Expected SARSA uses expected value
+                    num_actions = self.q_table.shape[3]
+                    next_q_values = self.q_table[np.arange(L)[:, None], np.arange(L), new_states, :]
+                    greedy_next_actions = np.argmax(next_q_values, axis=2)
+                    policy_probs = np.full((L, L, num_actions), self.algorithm.epsilon / num_actions)
+                    rows, cols = np.indices((L, L))
+                    policy_probs[rows, cols, greedy_next_actions] = (1 - self.algorithm.epsilon) + self.algorithm.epsilon / num_actions
+                    expected_next_q = np.sum(policy_probs * next_q_values, axis=2)
+                    td_error = rewards + self.gamma * expected_next_q - q_current
+                else:
+                    # Q-learning or Double Q-learning
+                    max_next_q = np.max(self.q_table[np.arange(L)[:, None], np.arange(L), new_states, :], axis=2)
+                    td_error = rewards + self.gamma * max_next_q - q_current
+                
                 alpha_t = self.alpha
-                self.q_table[idx[0], idx[1], old_states, actions] += alpha_t * td_error
 
                 # Neighbor influence update
                 if self.use_second_order:
@@ -474,8 +526,9 @@ class SPGG:
                 avg_reward_C_history.append(avg_reward_C)
                 avg_reward_D_history.append(avg_reward_D)
 
-                # Decay epsilon
-                self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+                # Decay epsilon (use algorithm's epsilon)
+                self.algorithm.decay_epsilon()
+                self.epsilon = self.algorithm.epsilon  # Keep for compatibility
                 epsilon_history_agg.append(self.epsilon)
 
                 # Save strategy snapshot
