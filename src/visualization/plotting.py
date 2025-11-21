@@ -200,6 +200,9 @@ def plot_figure_7(data_paths, output_filename):
     cmap = plt.cm.viridis
     vmin, vmax = -10, 10
     
+    im = None
+    data_found = False
+
     for i, (label, path) in enumerate(data_paths.items()):
         axes[i, 0].set_ylabel(label, fontsize=plt.rcParams['axes.labelsize'], 
                              rotation=90, labelpad=20)
@@ -209,6 +212,7 @@ def plot_figure_7(data_paths, output_filename):
             if snapshot is not None:
                 im = ax.imshow(snapshot, cmap=cmap, vmin=vmin, vmax=vmax, 
                               interpolation='nearest')
+                data_found = True
             else:
                 ax.text(0.5, 0.5, 'Data Missing', ha='center', va='center', fontsize=8)
             if i == 0:
@@ -218,7 +222,12 @@ def plot_figure_7(data_paths, output_filename):
             
     fig.subplots_adjust(right=0.85)
     cbar_ax = fig.add_axes([0.88, 0.15, 0.03, 0.7])
-    cbar = fig.colorbar(im, cax=cbar_ax)
+    if data_found and im is not None:
+        cbar = fig.colorbar(im, cax=cbar_ax)
+    else:
+        dummy = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+        dummy.set_array([])
+        cbar = fig.colorbar(dummy, cax=cbar_ax)
     cbar.set_label('Reputation Value')
 
     plt.savefig(output_filename, bbox_inches='tight')
