@@ -25,6 +25,9 @@ def main():
                        help='Number of processes to use (default: CPU count)')
     parser.add_argument('--no-progress', action='store_true',
                        help='Disable progress bar')
+    parser.add_argument('--algorithms', type=str, nargs='+', default=None,
+                       help='Space-separated list of RL algorithms to compare '
+                            '(qlearning, sarsa, expected_sarsa, double_qlearning, or "all")')
     
     args = parser.parse_args()
     
@@ -32,22 +35,53 @@ def main():
     print("Loading configuration...")
     config = load_config(args.config)
     
+    # Determine which algorithms to run
+    available_algorithms = ['qlearning', 'sarsa', 'expected_sarsa', 'double_qlearning']
+    config_alg = config.get('rl', {}).get('algorithm', 'qlearning').lower()
+    
+    if args.algorithms:
+        requested = [alg.lower() for alg in args.algorithms]
+        if 'all' in requested:
+            algorithms = available_algorithms
+        else:
+            invalid = [alg for alg in requested if alg not in available_algorithms]
+            if invalid:
+                raise ValueError(f"Unknown algorithms requested: {invalid}. "
+                                 f"Choose from {available_algorithms} or 'all'.")
+            algorithms = requested
+    else:
+        algorithms = [config_alg]
+    
+    algorithms = sorted(set(algorithms), key=available_algorithms.index)
+    print(f"Algorithms selected: {', '.join(algorithms)}")
+    
     # Generate parameter combinations
     print(f"Generating parameter combinations for '{args.experiment_type}'...")
-    param_combinations = generate_param_combinations(config, args.experiment_type)
+    base_param_combinations = generate_param_combinations(config, args.experiment_type)
+    
+    # Attach algorithm information to each parameter tuple
+    param_combinations = [
+        (*params, algorithm)
+        for params in base_param_combinations
+        for algorithm in algorithms
+    ]
     
     print(f"Total parameter combinations: {len(param_combinations)}")
     print("Parameters to run:")
     for params in param_combinations[:10]:  # Show first 10
-        if len(params) == 7:
+        if len(params) == 8:
+            r, kappa, use_so, alpha, w_P, rep_gain_C, state_rep, algorithm = params
+        elif len(params) == 7:
             r, kappa, use_so, alpha, w_P, rep_gain_C, state_rep = params
+            algorithm = 'qlearning'
         elif len(params) == 6:
             r, kappa, use_so, alpha, w_P, rep_gain_C = params
             state_rep = None
+            algorithm = 'qlearning'
         else:
             raise ValueError(f"Unexpected parameter format: {params}")
         rep_info = f", state={state_rep}" if state_rep is not None else ""
-        print(f"  - r={r}, κ={kappa}, M={2 if use_so else 1}, α={alpha}, w_P={w_P}, ΔR_C={rep_gain_C}{rep_info}")
+        print(f"  - r={r}, κ={kappa}, M={2 if use_so else 1}, α={alpha}, w_P={w_P}, ΔR_C={rep_gain_C}{rep_info}, algo={algorithm}")
     if len(param_combinations) > 10:
         print(f"  ... and {len(param_combinations) - 10} more")
     
