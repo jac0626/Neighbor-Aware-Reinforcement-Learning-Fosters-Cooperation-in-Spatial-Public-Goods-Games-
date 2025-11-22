@@ -7,7 +7,7 @@ model:
   c: 1.0                    # Contribution amount
   cost: 1.0                 # Cost of cooperation
   L: 100                    # Lattice size (L x L)
-  iterations: 20001         # Number of iterations
+  iterations: 100001         # Number of iterations
   num_of_strategies: 2      # Number of strategies (cooperate/defect)
   K: 0.1                    # Selection strength
   population_type: 0        # Population initialization type
