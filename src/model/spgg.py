@@ -446,7 +446,7 @@ class SPGG:
                 idx = np.indices((L, L))
                 q_current = self.q_table[idx[0], idx[1], old_states, actions]
                 
-                from .algorithms import SARSA, ExpectedSARSA
+                from .algorithms import SARSA, ExpectedSARSA, DoubleQLearning
                 if isinstance(self.algorithm, SARSA):
                     # SARSA uses next action's Q-value
                     next_actions = self.algorithm.select_action(self.q_table, new_states, L)
@@ -462,8 +462,13 @@ class SPGG:
                     policy_probs[rows, cols, greedy_next_actions] = (1 - self.algorithm.epsilon) + self.algorithm.epsilon / num_actions
                     expected_next_q = np.sum(policy_probs * next_q_values, axis=2)
                     td_error = rewards + self.gamma * expected_next_q - q_current
+                elif isinstance(self.algorithm, DoubleQLearning):
+                    # Double Q-learning: use combined Q-table for TD error calculation
+                    # This approximates the actual TD error used in the update
+                    max_next_q = np.max(self.q_table[np.arange(L)[:, None], np.arange(L), new_states, :], axis=2)
+                    td_error = rewards + self.gamma * max_next_q - q_current
                 else:
-                    # Q-learning or Double Q-learning
+                    # Q-learning
                     max_next_q = np.max(self.q_table[np.arange(L)[:, None], np.arange(L), new_states, :], axis=2)
                     td_error = rewards + self.gamma * max_next_q - q_current
                 
@@ -488,7 +493,20 @@ class SPGG:
                 a_star = nbr_actions[max_idx, rows, cols]
                 delta_beh = np.where(a_star == actions, 1.0, -1.0)
                 neighbor_update = lambda_nei * delta_beh
-                self.q_table[idx[0], idx[1], old_states, actions] += neighbor_update
+                
+                # For Double Q-learning, update both internal Q-tables
+                from .algorithms import DoubleQLearning
+                if isinstance(self.algorithm, DoubleQLearning):
+                    if self.algorithm.q_table_1 is not None and self.algorithm.q_table_2 is not None:
+                        # Apply neighbor influence to both Q-tables
+                        self.algorithm.q_table_1[idx[0], idx[1], old_states, actions] += neighbor_update
+                        self.algorithm.q_table_2[idx[0], idx[1], old_states, actions] += neighbor_update
+                        # Update combined Q-table
+                        self.q_table = self.algorithm.get_combined_q_table()
+                    else:
+                        self.q_table[idx[0], idx[1], old_states, actions] += neighbor_update
+                else:
+                    self.q_table[idx[0], idx[1], old_states, actions] += neighbor_update
 
                 # Calculate neighbor influence percentage
                 pct = np.abs(neighbor_update) / (np.abs(alpha_t * td_error) + np.abs(neighbor_update) + 1e-8) * 100
