@@ -86,7 +86,7 @@ def run_one_experiment(params: Tuple) -> Tuple[Tuple, Tuple[float, float]]:
     
     # Create and run SPGG model
     spgg = SPGG(
-        r=r_val, c=1, cost=1, iterations=20001, L=100,
+        r=r_val, c=1, cost=1, iterations=100001, L=100,
         num_of_strategies=2, K=0.1, population_type=0,
         alpha=alpha_val, gamma=0.9, epsilon=0.5, 
         epsilon_decay=0.99, epsilon_min=0.01,
