@@ -57,6 +57,13 @@ experiments:
     # Hybrid: kappa>0, w_P=0.95
     use_second_order: [false, true]
   
+  # All figures: combines figure_2_3_4 and figure_6_7_8_9
+  # Run this once to generate all data needed for all figures
+  # This avoids running experiments multiple times for different figures
+  all_figures:
+    # Uses parameters from figure_2_3_4 and figure_6_7_8_9 above
+    # No additional configuration needed - automatically combines both
+  
   # Custom parameter combinations
   custom:
     r_values: [1.0, 2.0, 3.0, 4.0, 5.0]

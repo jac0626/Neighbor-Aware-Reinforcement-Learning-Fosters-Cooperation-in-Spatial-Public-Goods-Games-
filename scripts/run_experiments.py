@@ -18,9 +18,9 @@ def main():
     parser.add_argument('--config', type=str, default=None,
                        help='Path to configuration file (default: use default config)')
     parser.add_argument('--experiment-type', type=str, 
-                       choices=['figure_2_3_4', 'figure_6_7_8_9', 'custom'],
+                       choices=['figure_2_3_4', 'figure_6_7_8_9', 'all_figures', 'custom'],
                        default='custom',
-                       help='Type of experiment to run')
+                       help='Type of experiment to run. Use "all_figures" to run all parameter combinations needed for all figures in one go.')
     parser.add_argument('--num-processes', type=int, default=None,
                        help='Number of processes to use (default: CPU count)')
     parser.add_argument('--no-progress', action='store_true',

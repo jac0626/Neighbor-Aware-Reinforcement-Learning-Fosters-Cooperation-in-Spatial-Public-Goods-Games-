@@ -30,14 +30,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run experiments for Figures 2–4
-        run: python scripts/run_experiments.py --experiment-type figure_2_3_4 --num-processes 2 --no-progress --algorithms ${{ matrix.algorithm }}
-
-      - name: Run experiments for Figures 6–9
-        run: python scripts/run_experiments.py --experiment-type figure_6_7_8_9 --num-processes 2 --no-progress --algorithms ${{ matrix.algorithm }}
+      - name: Run all experiments (for all figures)
+        run: python scripts/run_experiments.py --experiment-type all_figures --num-processes 2 --no-progress --algorithms ${{ matrix.algorithm }}
 
       - name: Generate publication figures
-        run: python scripts/plot_figures.py --data-dir . --output-dir paper_figures --figures all
+        run: python scripts/plot_figures.py --data-dir . --output-dir paper_figures --figures all --algorithm ${{ matrix.algorithm }}
 
       - name: Upload figures
         uses: actions/upload-artifact@v4

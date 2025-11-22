@@ -45,7 +45,7 @@ def generate_param_combinations(config: Dict[str, Any],
     config : dict
         Configuration dictionary
     experiment_type : str
-        Type of experiment ('figure_2_3_4', 'figure_6_7_8_9', 'custom')
+        Type of experiment ('figure_2_3_4', 'figure_6_7_8_9', 'all_figures', 'custom')
         
     Returns:
     --------
@@ -95,6 +95,44 @@ def generate_param_combinations(config: Dict[str, Any],
         # Hybrid: kappa>0, w_P=0.95
         for use_so, state_rep in product(use_second_order_list, state_reps):
             param_combinations.append((r, 1.0, use_so, base_alpha, 0.95, base_rep_gain_C, state_rep))
+    
+    elif experiment_type == 'all_figures':
+        # Combine all parameter combinations needed for all figures
+        # This allows running experiments once and generating all figures from the same data
+        
+        # Parameters for Figures 2-4
+        fig_2_3_4_config = exp_config.get('figure_2_3_4', {})
+        r_2_3_4 = fig_2_3_4_config.get('r', 3.6)
+        kappas_2_3_4 = fig_2_3_4_config.get('kappas', [0.0, 0.5, 1.0, 1.5, 2.0])
+        use_second_order_list = fig_2_3_4_config.get('use_second_order', [False, True])
+        w_P_2_3_4 = fig_2_3_4_config.get('reward_weight_payoff', 1.0)
+        state_reps = fig_2_3_4_config.get('state_representation', [state_representation])
+        if isinstance(state_reps, str):
+            state_reps = [state_reps]
+        
+        # Add Figure 2-4 parameters
+        for kappa, use_so, state_rep in product(kappas_2_3_4, use_second_order_list, state_reps):
+            param_combinations.append((r_2_3_4, kappa, use_so, base_alpha, w_P_2_3_4, base_rep_gain_C, state_rep))
+        
+        # Parameters for Figures 6-9
+        fig_6_7_8_9_config = exp_config.get('figure_6_7_8_9', {})
+        r_6_7_8_9 = fig_6_7_8_9_config.get('r', 3.0)
+        use_second_order_list_6_9 = fig_6_7_8_9_config.get('use_second_order', [False, True])
+        state_reps_6_9 = fig_6_7_8_9_config.get('state_representation', [state_representation])
+        if isinstance(state_reps_6_9, str):
+            state_reps_6_9 = [state_reps_6_9]
+        
+        # Sole Reputation: kappa=0, w_P=0.95
+        for use_so, state_rep in product(use_second_order_list_6_9, state_reps_6_9):
+            param_combinations.append((r_6_7_8_9, 0.0, use_so, base_alpha, 0.95, base_rep_gain_C, state_rep))
+        
+        # Sole NI: kappa>0, w_P=1.0
+        for use_so, state_rep in product(use_second_order_list_6_9, state_reps_6_9):
+            param_combinations.append((r_6_7_8_9, 1.0, use_so, base_alpha, 1.0, base_rep_gain_C, state_rep))
+        
+        # Hybrid: kappa>0, w_P=0.95
+        for use_so, state_rep in product(use_second_order_list_6_9, state_reps_6_9):
+            param_combinations.append((r_6_7_8_9, 1.0, use_so, base_alpha, 0.95, base_rep_gain_C, state_rep))
     
     elif experiment_type == 'custom':
         custom_config = exp_config.get('custom', {})
