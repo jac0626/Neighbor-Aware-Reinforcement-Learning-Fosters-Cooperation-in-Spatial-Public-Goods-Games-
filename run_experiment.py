@@ -54,6 +54,7 @@ def main():
     # Override arguments
     parser.add_argument("--r", type=float, nargs="+", help="Override r values")
     parser.add_argument("--influence_factor", type=float, nargs="+", help="Override influence_factor values")
+    parser.add_argument("--iterations", type=int, help="Override number of iterations")
     
     args = parser.parse_args()
     
@@ -75,6 +76,8 @@ def main():
         config_dict = base_config.to_dict()
         config_dict['r'] = r_val
         config_dict['influence_factor'] = inf_val
+        if args.iterations:
+            config_dict['iterations'] = args.iterations
         config = SimulationConfig.from_dict(config_dict)
         
         folder_name = os.path.join(args.output_dir, f"r{r_val}_inf{inf_val}_{args.state_type}")
