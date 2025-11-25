@@ -88,6 +88,13 @@ class SPGG:
                 hidden_dim=self.config.dqn_hidden_dim
             ).to(self.device)
             
+            self.dqn_target = SharedDQN(
+                input_dim=self.config.dqn_input_dim,
+                hidden_dim=self.config.dqn_hidden_dim
+            ).to(self.device)
+            self.dqn_target.load_state_dict(self.dqn.state_dict())
+            self.dqn_target.eval()
+            
             self.optimizer = optim.Adam(self.dqn.parameters(), lr=self.config.dqn_lr)
             self.replay_buffer = ReplayBuffer(self.config.dqn_buffer_size)
             self.loss_fn = torch.nn.MSELoss()
@@ -345,7 +352,7 @@ class SPGG:
                     
                     # Target Q(s', a')
                     with torch.no_grad():
-                        next_q_values = self.dqn(next_states_b)
+                        next_q_values = self.dqn_target(next_states_b)
                         max_next_q_b = next_q_values.max(1)[0]
                         target_q = rewards_b + self.config.dqn_gamma * max_next_q_b
                     
@@ -354,6 +361,10 @@ class SPGG:
                     self.optimizer.zero_grad()
                     loss.backward()
                     self.optimizer.step()
+                    
+                # Update Target Network
+                if i % self.config.dqn_target_update_freq == 0:
+                    self.dqn_target.load_state_dict(self.dqn.state_dict())
 
             # Neighbor Influence (NI)
             if self.config.use_second_order:

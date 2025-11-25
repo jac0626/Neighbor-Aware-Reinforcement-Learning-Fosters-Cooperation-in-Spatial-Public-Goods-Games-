@@ -58,6 +58,7 @@ class SimulationConfig:
     dqn_buffer_size: int = 100000     # Replay buffer size
     dqn_batch_size: int = 64          # Training batch size
     dqn_update_freq: int = 10         # Network training frequency (every N rounds)
+    dqn_target_update_freq: int = 100 # Target network update frequency (every N rounds)
     dqn_input_dim: int = 4            # Continuous state vector dimension (default 4: self_rep, nei_rep, nei_coop, self_payoff)
 
     def __post_init__(self):
