@@ -318,7 +318,8 @@ class SPGG:
                 # Buffer size 100k -> fills in 10 steps.
                 # Maybe sample 100 agents per step?
                 # For now, let's push a random sample of 128 agents to avoid buffer overflow/slowdown
-                flat_indices = np.random.choice(L*L, size=128, replace=False)
+                sample_size = min(L*L, 128)
+                flat_indices = np.random.choice(L*L, size=sample_size, replace=False)
                 rows_sample, cols_sample = np.unravel_index(flat_indices, (L, L))
                 
                 for r_idx, c_idx in zip(rows_sample, cols_sample):
