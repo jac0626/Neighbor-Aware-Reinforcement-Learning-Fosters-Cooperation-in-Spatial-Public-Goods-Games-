@@ -11,6 +11,10 @@ from src.config import SimulationConfig
 from src.core.state_strategies import StateProvider
 from src.utils.math_utils import overlap5
 from src.utils.data_utils import DataManager
+import torch
+import torch.optim as optim
+from scipy.signal import convolve2d
+from src.core.dqn_model import SharedDQN, ReplayBuffer
 
 class SPGG:
     """
@@ -74,6 +78,25 @@ class SPGG:
         # Current epsilon
         self.epsilon = config.epsilon
 
+        # --- Hybrid Dual-Brain Setup ---
+        if self.config.use_dqn:
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            print(f"DQN initialized on device: {self.device}")
+            
+            self.dqn = SharedDQN(
+                input_dim=self.config.dqn_input_dim,
+                hidden_dim=self.config.dqn_hidden_dim
+            ).to(self.device)
+            
+            self.optimizer = optim.Adam(self.dqn.parameters(), lr=self.config.dqn_lr)
+            self.replay_buffer = ReplayBuffer(self.config.dqn_buffer_size)
+            self.loss_fn = torch.nn.MSELoss()
+            
+            # Convolution kernel for neighbor calculation (Von Neumann neighborhood, excluding self)
+            self.kernel_neighbors = np.array([[0, 1, 0], 
+                                            [1, 0, 1], 
+                                            [0, 1, 0]])
+
     def fun_args_id(self, *args):
         return hash(args)
 
@@ -114,6 +137,31 @@ class SPGG:
 
     def P_AT_g_m(self, group_offset=(0,0), member_offset=(0,0)):
         return self.P_g_m(group_offset, member_offset)
+
+    def _compute_continuous_states(self, P_norm: np.ndarray) -> np.ndarray:
+        """
+        Compute continuous state vector for each agent (L, L, input_dim).
+        Features: [Self Normalized Reputation, Neighbor Avg Reputation, Neighbor Coop Rate, Self Normalized Payoff]
+        """
+        L = self.L
+        # Feature 0: Self Reputation (Simple Max Normalization)
+        max_abs_R = max(abs(self.config.R_min), abs(self.config.R_max))
+        feat_self_rep = self.R / (max_abs_R + 1e-9)
+        
+        # Feature 1: Neighbor Average Reputation
+        nei_rep_sum = convolve2d(feat_self_rep, self.kernel_neighbors, mode='same', boundary='wrap')
+        feat_nei_avg_rep = nei_rep_sum / 4.0
+        
+        # Feature 2: Neighbor Coop Rate (0=Coop, 1=Defect -> Convert: 1=Coop, 0=Defect)
+        is_coop = (self._Sn == 0).astype(float)
+        nei_coop_sum = convolve2d(is_coop, self.kernel_neighbors, mode='same', boundary='wrap')
+        feat_nei_coop_rate = nei_coop_sum / 4.0
+        
+        # Feature 3: Self Payoff
+        feat_payoff = P_norm
+        
+        continuous_states = np.stack([feat_self_rep, feat_nei_avg_rep, feat_nei_coop_rate, feat_payoff], axis=2)
+        return continuous_states
 
     def update_reputation(self, actions):
         delta_R = np.where(actions == 0, self.config.rep_gain_C, -self.config.delta_R_D)
@@ -180,12 +228,29 @@ class SPGG:
             if coop_rate == 0 or coop_rate == 1:
                 break
                 
-            # 3. Q-Learning Update
+            # 3. Q-Learning & DQN Update
             old_states = self.state_provider.get_state(self.R, self._Sn)
             
+            # --- DQN Logic: Get Continuous States & Q-Values ---
+            if self.config.use_dqn:
+                cont_states = self._compute_continuous_states(P)
+                cont_states_tensor = torch.FloatTensor(cont_states).to(self.device) # (L, L, input_dim)
+                with torch.no_grad():
+                    dqn_q_values = self.dqn(cont_states_tensor).cpu().numpy() # (L, L, 2)
+            
+            # Get Q-table values
+            q_table_values = self.q_table[np.arange(L)[:, None], np.arange(L), old_states, :] # (L, L, 2)
+            
+            # Mix Q-values
+            if self.config.use_dqn:
+                lam = self.config.dqn_lambda
+                final_q_values = (1 - lam) * q_table_values + lam * dqn_q_values
+            else:
+                final_q_values = q_table_values
+
+            # Action Selection
             explore = np.random.rand(L, L) < self.epsilon
-            q_values = self.q_table[np.arange(L)[:, None], np.arange(L), old_states, :]
-            greedy_actions = np.argmax(q_values, axis=2)
+            greedy_actions = np.argmax(final_q_values, axis=2)
             random_actions = np.random.randint(0, 2, size=(L, L))
             actions = np.where(explore, random_actions, greedy_actions)
             
@@ -223,13 +288,72 @@ class SPGG:
             avg_reward_C_history.append(np.mean(rewards[S_coop_mask]) if np.any(S_coop_mask) else 0)
             avg_reward_D_history.append(np.mean(rewards[S_def_mask]) if np.any(S_def_mask) else 0)
             
-            # Q-Table Update (TD)
+            # Q-Table Update (TD) - Always update Q-table
             max_next_q = np.max(self.q_table[np.arange(L)[:, None], np.arange(L), new_states, :], axis=2)
             idx = np.indices((L, L))
             q_current = self.q_table[idx[0], idx[1], old_states, actions]
             td_error = rewards + self.config.gamma * max_next_q - q_current
             self.q_table[idx[0], idx[1], old_states, actions] += self.config.alpha * td_error
             
+            # --- DQN Training ---
+            if self.config.use_dqn:
+                # Store experience
+                next_cont_states = self._compute_continuous_states(P) # Note: P is from current step, ideally should be next step P but approximation is fine or recompute
+                # Actually, P depends on S. We just updated S to _Sn (actions). So we need P for next step?
+                # In this loop structure, P is computed at start of loop based on _Sn.
+                # So 'next_cont_states' should be based on the NEW _Sn and NEW R.
+                # We updated R and _Sn above. But P is not recomputed yet.
+                # Recomputing P for next state features:
+                # (Optimization: We can just use the P that will be computed in next iter, but for now let's recompute or approximate)
+                # For simplicity and speed, we can use the current P as proxy or recompute locally.
+                # Let's recompute P locally for accurate next state
+                P_next = self.P_AT_g_m() # This uses current _Sn which is next state
+                # Normalize P_next
+                P_next_norm = (P_next - self.normlize_min) / (self.normlize_max - self.normlize_min)
+                next_cont_states = self._compute_continuous_states(P_next_norm)
+                
+                # Flatten and push to buffer
+                # We can push all agents or a subset. Pushing all might be too much data?
+                # Let's push a random subset or all. 100x100 = 10000 transitions per step.
+                # Buffer size 100k -> fills in 10 steps.
+                # Maybe sample 100 agents per step?
+                # For now, let's push a random sample of 128 agents to avoid buffer overflow/slowdown
+                flat_indices = np.random.choice(L*L, size=128, replace=False)
+                rows_sample, cols_sample = np.unravel_index(flat_indices, (L, L))
+                
+                for r_idx, c_idx in zip(rows_sample, cols_sample):
+                    self.replay_buffer.push(
+                        cont_states[r_idx, c_idx],
+                        actions[r_idx, c_idx],
+                        rewards[r_idx, c_idx],
+                        next_cont_states[r_idx, c_idx]
+                    )
+                
+                # Train Network
+                if i % self.config.dqn_update_freq == 0 and len(self.replay_buffer) > self.config.dqn_batch_size:
+                    states_b, actions_b, rewards_b, next_states_b = self.replay_buffer.sample(self.config.dqn_batch_size)
+                    
+                    states_b = states_b.to(self.device)
+                    actions_b = actions_b.to(self.device)
+                    rewards_b = rewards_b.to(self.device)
+                    next_states_b = next_states_b.to(self.device)
+                    
+                    # Q(s, a)
+                    q_values_b = self.dqn(states_b)
+                    q_action = q_values_b.gather(1, actions_b.unsqueeze(1)).squeeze(1)
+                    
+                    # Target Q(s', a')
+                    with torch.no_grad():
+                        next_q_values = self.dqn(next_states_b)
+                        max_next_q_b = next_q_values.max(1)[0]
+                        target_q = rewards_b + self.config.dqn_gamma * max_next_q_b
+                    
+                    loss = self.loss_fn(q_action, target_q)
+                    
+                    self.optimizer.zero_grad()
+                    loss.backward()
+                    self.optimizer.step()
+
             # Neighbor Influence (NI)
             if self.config.use_second_order:
                 offsets = [

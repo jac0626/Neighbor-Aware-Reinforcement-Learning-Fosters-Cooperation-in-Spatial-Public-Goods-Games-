@@ -49,6 +49,17 @@ class SimulationConfig:
     # Derived parameters (not typically set by user, but can be)
     reward_weight_rep: float = field(init=False)
     
+    # Hybrid Dual-Brain (DQN) parameters
+    use_dqn: bool = False             # Whether to enable hybrid dual-brain architecture
+    dqn_lambda: float = 0.5           # Mixing coefficient (0=pure Q-table, 1=pure DQN)
+    dqn_lr: float = 1e-3              # DQN learning rate
+    dqn_gamma: float = 0.9            # DQN discount factor
+    dqn_hidden_dim: int = 64          # Hidden layer dimension
+    dqn_buffer_size: int = 100000     # Replay buffer size
+    dqn_batch_size: int = 64          # Training batch size
+    dqn_update_freq: int = 10         # Network training frequency (every N rounds)
+    dqn_input_dim: int = 4            # Continuous state vector dimension (default 4: self_rep, nei_rep, nei_coop, self_payoff)
+
     def __post_init__(self):
         self.reward_weight_rep = 1.0 - self.reward_weight_payoff
 
