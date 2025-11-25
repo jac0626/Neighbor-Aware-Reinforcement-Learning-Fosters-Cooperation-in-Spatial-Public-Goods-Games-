@@ -1,0 +1,55 @@
+name: Run SPGG Experiments
+
+on:
+  workflow_dispatch:
+    inputs:
+      iterations:
+        description: 'Number of iterations per simulation'
+        required: true
+        default: '20000'
+      state_type:
+        description: 'State type (reputation or action)'
+        required: true
+        default: 'reputation'
+        type: choice
+        options:
+        - reputation
+        - action
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        r: [3.0, 3.6, 4.0, 4.5]
+        influence_factor: [0.0, 0.5, 1.0, 1.5]
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        
+    - name: Run Simulation
+      run: |
+        python run_experiment.py \
+          --r ${{ matrix.r }} \
+          --influence_factor ${{ matrix.influence_factor }} \
+          --iterations ${{ inputs.iterations }} \
+          --state_type ${{ inputs.state_type }} \
+          --plot \
+          --output_dir results
+          
+    - name: Upload Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: results-r${{ matrix.r }}-inf${{ matrix.influence_factor }}
+        path: results/
