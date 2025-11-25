@@ -1,5 +1,5 @@
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from typing import Optional, Dict, Any
 import yaml
 import json
@@ -66,9 +66,9 @@ class SimulationConfig:
 
     @classmethod
     def from_dict(cls, config_dict: Dict[str, Any]) -> 'SimulationConfig':
-        """Creates a SimulationConfig from a dictionary, filtering unknown keys."""
-        known_keys = cls.__annotations__.keys()
-        filtered_dict = {k: v for k, v in config_dict.items() if k in known_keys}
+        """Creates a SimulationConfig from a dictionary, filtering unknown keys and non-init fields."""
+        valid_init_keys = {f.name for f in fields(cls) if f.init}
+        filtered_dict = {k: v for k, v in config_dict.items() if k in valid_init_keys}
         return cls(**filtered_dict)
 
     @classmethod
