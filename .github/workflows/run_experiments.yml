@@ -23,6 +23,7 @@ jobs:
       matrix:
         r: [3.0, 3.6, 4.0, 4.5]
         influence_factor: [0.0, 0.5, 1.0, 1.5]
+        dqn_lambda: [0.1, 0.3, 0.5]
       fail-fast: false
 
     steps:
@@ -43,6 +44,7 @@ jobs:
         python run_experiment.py \
           --r ${{ matrix.r }} \
           --influence_factor ${{ matrix.influence_factor }} \
+          --dqn_lambda ${{ matrix.dqn_lambda }} \
           --iterations ${{ inputs.iterations }} \
           --state_type ${{ inputs.state_type }} \
           --plot \
@@ -51,5 +53,5 @@ jobs:
     - name: Upload Results
       uses: actions/upload-artifact@v4
       with:
-        name: results-r${{ matrix.r }}-inf${{ matrix.influence_factor }}
+        name: results-r${{ matrix.r }}-inf${{ matrix.influence_factor }}-lam${{ matrix.dqn_lambda }}
         path: results/

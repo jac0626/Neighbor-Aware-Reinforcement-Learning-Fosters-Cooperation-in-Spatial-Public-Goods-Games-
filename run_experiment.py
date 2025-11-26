@@ -55,6 +55,7 @@ def main():
     parser.add_argument("--r", type=float, nargs="+", help="Override r values")
     parser.add_argument("--influence_factor", type=float, nargs="+", help="Override influence_factor values")
     parser.add_argument("--iterations", type=int, help="Override number of iterations")
+    parser.add_argument("--dqn_lambda", type=float, nargs="+", help="Override dqn_lambda values")
     
     args = parser.parse_args()
     
@@ -67,20 +68,22 @@ def main():
     # Prepare Parameter Sweep
     r_list = args.r if args.r else [base_config.r]
     inf_list = args.influence_factor if args.influence_factor else [base_config.influence_factor]
+    lambda_list = args.dqn_lambda if args.dqn_lambda else [base_config.dqn_lambda]
     
     # Generate Configurations
     tasks = []
-    for r_val, inf_val in product(r_list, inf_list):
+    for r_val, inf_val, lam_val in product(r_list, inf_list, lambda_list):
         # Create a copy of config with updated values
         # Note: dataclass replace is cleaner but manual dict update works too
         config_dict = base_config.to_dict()
         config_dict['r'] = r_val
         config_dict['influence_factor'] = inf_val
+        config_dict['dqn_lambda'] = lam_val
         if args.iterations:
             config_dict['iterations'] = args.iterations
         config = SimulationConfig.from_dict(config_dict)
         
-        folder_name = os.path.join(args.output_dir, f"r{r_val}_inf{inf_val}_{args.state_type}")
+        folder_name = os.path.join(args.output_dir, f"r{r_val}_inf{inf_val}_lam{lam_val}_{args.state_type}")
         tasks.append((config, folder_name, args.state_type))
         
     print(f"Running {len(tasks)} simulations...")
