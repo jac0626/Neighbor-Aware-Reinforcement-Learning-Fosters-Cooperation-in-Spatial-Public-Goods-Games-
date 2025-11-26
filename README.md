@@ -13,6 +13,7 @@ The codebase has been refactored for better modularity and maintainability:
 ├── src/
 │   ├── core/                 # Core simulation logic
 │   │   ├── spgg_model.py     # Main SPGG class
+│   │   ├── dqn_model.py      # Shared DQN and ReplayBuffer
 │   │   └── state_strategies.py # State definitions (Reputation vs Action)
 │   ├── utils/                # Utility functions
 │   │   ├── math_utils.py     # Math helpers (e.g., overlap5)
@@ -29,7 +30,7 @@ The codebase has been refactored for better modularity and maintainability:
 Ensure you have the required dependencies installed:
 
 ```bash
-pip install numpy matplotlib scipy h5py pyyaml
+pip install numpy matplotlib scipy h5py pyyaml torch
 ```
 
 ## Usage
@@ -47,7 +48,24 @@ python run_experiment.py --r 3.0 --influence_factor 1.0 --state_type reputation 
 -   `--influence_factor`: Strength of neighbor influence (default: 1.0).
 -   `--state_type`: Type of state definition. Options: `reputation` (default) or `action`.
 -   `--plot`: If set, generates plots immediately after the simulation.
+-   `--plot`: If set, generates plots immediately after the simulation.
 -   `--output_dir`: Directory to save results (default: `results`).
+-   `--iterations`: Number of iterations (default: 1000).
+-   `--dqn_lambda`: Mixing coefficient for DQN (0.0 = pure Q-table, 1.0 = pure DQN).
+
+### Hybrid Dual-Brain Architecture
+
+This project implements a "Hybrid Dual-Brain" architecture where agents make decisions using a combination of:
+1.  **Q-Table (Fast System)**: Traditional tabular Q-learning based on discrete states (Reputation/Action).
+2.  **Shared DQN (Slow System)**: A deep neural network shared across all agents, taking continuous state features (Self Reputation, Neighbor Avg Reputation, Neighbor Coop Rate, Payoff) as input.
+
+The final Q-value is a weighted mix: $Q_{final} = (1 - \lambda) \cdot Q_{table} + \lambda \cdot Q_{dqn}$
+
+To enable DQN and tune the mixing parameter $\lambda$:
+
+```bash
+python run_experiment.py --r 3.0 --dqn_lambda 0.1 0.3 0.5 --parallel
+```
 
 ### Running a Parameter Sweep
 
@@ -64,6 +82,15 @@ You can define all parameters in a YAML file (see `configs/default_config.yaml` 
 ```bash
 python run_experiment.py --config configs/default_config.yaml
 ```
+
+### Running via GitHub Actions
+
+You can run large-scale experiments in the cloud using the provided GitHub Actions workflow:
+1.  Go to the **Actions** tab in your repository.
+2.  Select **Run SPGG Experiments**.
+3.  Click **Run workflow**.
+4.  Configure `iterations` and `state_type`.
+5.  The workflow automatically sweeps over `r`, `influence_factor`, and `dqn_lambda`.
 
 ## Key Components
 
