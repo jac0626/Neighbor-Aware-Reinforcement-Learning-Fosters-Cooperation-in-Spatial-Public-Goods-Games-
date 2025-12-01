@@ -29,10 +29,15 @@ def load_data(results_dir):
             
             parts = filepath.split(os.sep)
             # Find the folder that starts with 'r' and contains 'lam'
-            param_folder = next((p for p in parts if p.startswith('r') and 'lam' in p), None)
+            # We iterate through all parts to find one that matches the pattern
+            param_folder = None
+            for p in parts:
+                if p.startswith('r') and 'lam' in p and 'inf' in p:
+                     param_folder = p
+                     break
             
             if not param_folder:
-                print(f"Skipping {filepath}: Cannot parse parameters from path.")
+                print(f"Skipping {filepath}: Cannot find parameter folder in path {filepath}")
                 continue
                 
             # Parse r and lambda
