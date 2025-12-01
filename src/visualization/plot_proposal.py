@@ -37,9 +37,25 @@ def load_data(results_dir):
                 
             # Parse r and lambda
             # Format: r3.0_inf1.0_lam0.1_reputation
+            # We look for the segment that matches this pattern
             segments = param_folder.split('_')
-            r_val = float(segments[0][1:])
-            lam_val = float(segments[2][3:])
+            
+            # Helper to safely extract float value after a prefix
+            def get_val(segs, prefix):
+                for s in segs:
+                    if s.startswith(prefix):
+                        try:
+                            return float(s[len(prefix):])
+                        except ValueError:
+                            continue
+                return None
+
+            r_val = get_val(segments, 'r')
+            lam_val = get_val(segments, 'lam')
+            
+            if r_val is None or lam_val is None:
+                 print(f"Skipping {filepath}: Could not parse r or lam from {param_folder}")
+                 continue
             
             if r_val not in data:
                 data[r_val] = {}
@@ -182,13 +198,22 @@ def main():
         
     # Generate Plots
     # 1. Evolution at r=3.0 (Typical dilemma)
-    plot_cooperation_evolution(data, target_r=3.0, output_dir=output_dir)
+    # Find a suitable r if 3.0 is missing
+    target_r = 3.0
+    if target_r not in data:
+        available_rs = sorted(data.keys())
+        if available_rs:
+            # Pick one in the middle
+            target_r = available_rs[len(available_rs)//2]
+            print(f"r=3.0 not found, falling back to r={target_r}")
+    
+    plot_cooperation_evolution(data, target_r=target_r, output_dir=output_dir)
     
     # 2. Robustness across all r
     plot_robustness_analysis(data, output_dir=output_dir)
     
-    # 3. Lambda impact at r=3.0
-    plot_lambda_impact(data, target_r=3.0, output_dir=output_dir)
+    # 3. Lambda impact at r=3.0 (or fallback)
+    plot_lambda_impact(data, target_r=target_r, output_dir=output_dir)
     
     print(f"All plots saved to {output_dir}")
 
