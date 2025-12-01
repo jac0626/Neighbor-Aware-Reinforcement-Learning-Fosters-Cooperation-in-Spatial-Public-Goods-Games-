@@ -9,6 +9,7 @@ jobs:
     strategy:
       matrix:
         dqn_lambda: [0.0, 0.1, 0.3, 0.5]
+        r_chunk: [A, B, C, D]
       fail-fast: false
       
     steps:
@@ -24,15 +25,23 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         
-    - name: Run Simulation (Multi-Core)
+    - name: Run Simulation (Max Parallelism)
       run: |
-        # 4-Core Runner Optimization
-        # We run a fine-grained sweep of r values in parallel on this runner.
-        # r range: 2.0 to 4.4 (step 0.2) -> 13 simulations
-        # With 4 cores, this will take ~4 batches.
+        # Map chunk ID to r values
+        # Total r range: 2.0 to 4.4 (13 values)
+        # Split into 4 chunks to fit 4-core runners (3-4 sims per runner)
+        
+        case ${{ matrix.r_chunk }} in
+          A) R_VALUES="2.0 2.2 2.4 2.6" ;;
+          B) R_VALUES="2.8 3.0 3.2 3.4" ;;
+          C) R_VALUES="3.6 3.8 4.0 4.2" ;;
+          D) R_VALUES="4.4" ;;
+        esac
+        
+        echo "Running chunk ${{ matrix.r_chunk }} with r values: $R_VALUES"
         
         python run_experiment.py \
-          --r 2.0 2.2 2.4 2.6 2.8 3.0 3.2 3.4 3.6 3.8 4.0 4.2 4.4 \
+          --r $R_VALUES \
           --dqn_lambda ${{ matrix.dqn_lambda }} \
           --iterations 100000 \
           --state_type reputation \
@@ -42,7 +51,7 @@ jobs:
     - name: Upload Results
       uses: actions/upload-artifact@v4
       with:
-        name: results-lam${{ matrix.dqn_lambda }}
+        name: results-lam${{ matrix.dqn_lambda }}-chunk${{ matrix.r_chunk }}
         path: results/
 
   plot:
