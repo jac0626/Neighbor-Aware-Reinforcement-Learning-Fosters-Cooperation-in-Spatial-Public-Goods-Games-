@@ -43,7 +43,7 @@ jobs:
         python run_experiment.py \
           --r $R_VALUES \
           --dqn_lambda ${{ matrix.dqn_lambda }} \
-          --iterations 100000 \
+          --iterations 1000 \
           --state_type reputation \
           --parallel \
           --output_dir results
@@ -78,6 +78,7 @@ jobs:
         
     - name: Generate Plots
       run: |
+        export PYTHONPATH=$PYTHONPATH:.
         python src/visualization/plot_proposal.py
         
     - name: Upload Proposal Plots
