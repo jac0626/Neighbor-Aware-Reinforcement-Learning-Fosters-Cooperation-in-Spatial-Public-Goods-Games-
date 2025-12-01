@@ -189,6 +189,138 @@ def plot_lambda_impact(data, target_r, output_dir):
     plt.close()
     print("Generated Plot 3: Lambda Impact")
 
+def plot_evolution_grid(data, output_dir):
+    """
+    Plot 4: Grid of cooperation evolution at multiple r values.
+    Shows low, medium, high dilemma scenarios.
+    """
+    available_rs = sorted(data.keys())
+    if len(available_rs) < 3:
+        print("Not enough r values for grid plot.")
+        return
+    
+    # Select representative r values: low (easy), medium, high (hard)
+    # Low r: cooperation harder (less synergy)
+    # High r: cooperation easier (more synergy)
+    low_r = available_rs[0]
+    mid_r = available_rs[len(available_rs)//2]
+    high_r = available_rs[-1]
+    
+    # Also pick one more intermediate value if available
+    if len(available_rs) >= 5:
+        mid_low_r = available_rs[len(available_rs)//4]
+        selected_rs = [low_r, mid_low_r, mid_r, high_r]
+    else:
+        selected_rs = [low_r, mid_r, high_r]
+    
+    setup_matplotlib_for_publication()
+    n_plots = len(selected_rs)
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    axes = axes.flatten()
+    
+    colors_dual = ['#1f77b4', '#ff7f0e', '#2ca02c']
+    
+    for idx, r_val in enumerate(selected_rs):
+        ax = axes[idx]
+        
+        # Baseline (Lambda=0)
+        if 0.0 in data[r_val]:
+            runs = data[r_val][0.0]
+            avg_run = np.mean(runs, axis=0)
+            ax.plot(avg_run, label='Single-Brain (λ=0)', color='gray', linestyle='--', linewidth=2.5, alpha=0.8)
+        
+        # Dual-Brain
+        dual_lambdas = sorted([k for k in data[r_val].keys() if k > 0])
+        for i, lam in enumerate(dual_lambdas):
+            runs = data[r_val][lam]
+            avg_run = np.mean(runs, axis=0)
+            ax.plot(avg_run, label=f'λ={lam}', color=colors_dual[i % len(colors_dual)], linewidth=2)
+        
+        ax.set_xlabel('Iterations', fontsize=11)
+        ax.set_ylabel('Cooperation Rate', fontsize=11)
+        ax.set_title(f'r = {r_val}', fontsize=12, fontweight='bold')
+        ax.legend(fontsize=9, loc='best')
+        ax.grid(True, alpha=0.3)
+        ax.set_ylim(-0.05, 1.05)
+        
+        # Add text annotation for difficulty
+        if r_val == low_r:
+            ax.text(0.05, 0.95, 'Low Synergy\n(Hard)', transform=ax.transAxes, 
+                   fontsize=9, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+        elif r_val == high_r:
+            ax.text(0.05, 0.95, 'High Synergy\n(Easy)', transform=ax.transAxes,
+                   fontsize=9, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.5))
+    
+    # Hide extra subplot if we have only 3
+    if n_plots < 4:
+        axes[3].axis('off')
+    
+    plt.suptitle('Cooperation Evolution Across Different Synergy Levels', fontsize=14, fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, '4_evolution_grid.png'), dpi=300)
+    plt.close()
+    print("Generated Plot 4: Evolution Grid")
+
+def plot_heatmap_comparison(data, output_dir):
+    """
+    Plot 5: Heatmap showing final cooperation rate for all (r, lambda) combinations.
+    """
+    setup_matplotlib_for_publication()
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+    
+    r_values = sorted(data.keys())
+    all_lambdas = set()
+    for r in r_values:
+        all_lambdas.update(data[r].keys())
+    lambda_values = sorted(all_lambdas)
+    
+    # Create matrix for final cooperation rates
+    coop_matrix = np.zeros((len(lambda_values), len(r_values)))
+    
+    for i, lam in enumerate(lambda_values):
+        for j, r in enumerate(r_values):
+            if lam in data[r]:
+                final_coop = np.mean([run[-1] for run in data[r][lam]])
+                coop_matrix[i, j] = final_coop
+            else:
+                coop_matrix[i, j] = np.nan
+    
+    # Plot 1: Heatmap
+    im1 = ax1.imshow(coop_matrix, aspect='auto', cmap='RdYlGn', vmin=0, vmax=1)
+    ax1.set_xticks(range(len(r_values)))
+    ax1.set_xticklabels([f'{r:.1f}' for r in r_values], rotation=45)
+    ax1.set_yticks(range(len(lambda_values)))
+    ax1.set_yticklabels([f'{lam:.1f}' for lam in lambda_values])
+    ax1.set_xlabel('Synergy Factor (r)', fontsize=12)
+    ax1.set_ylabel('DQN Weight (λ)', fontsize=12)
+    ax1.set_title('Final Cooperation Rate Heatmap', fontsize=13, fontweight='bold')
+    
+    # Add text annotations
+    for i in range(len(lambda_values)):
+        for j in range(len(r_values)):
+            if not np.isnan(coop_matrix[i, j]):
+                text = ax1.text(j, i, f'{coop_matrix[i, j]:.2f}',
+                              ha="center", va="center", color="black", fontsize=8)
+    
+    plt.colorbar(im1, ax=ax1, label='Cooperation Rate')
+    
+    # Plot 2: Line plot showing trends
+    for i, lam in enumerate(lambda_values):
+        y_vals = coop_matrix[i, :]
+        ax2.plot(r_values, y_vals, 'o-', label=f'λ={lam:.1f}', linewidth=2, markersize=6)
+    
+    ax2.set_xlabel('Synergy Factor (r)', fontsize=12)
+    ax2.set_ylabel('Final Cooperation Rate', fontsize=12)
+    ax2.set_title('Cooperation vs Synergy by λ', fontsize=13, fontweight='bold')
+    ax2.legend(fontsize=10)
+    ax2.grid(True, alpha=0.3)
+    ax2.set_ylim(-0.05, 1.05)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, '5_heatmap_comparison.png'), dpi=300)
+    plt.close()
+    print("Generated Plot 5: Heatmap Comparison")
+
 def main():
     results_dir = "all_results" # Folder where artifacts are downloaded
     output_dir = "proposal_plots"
@@ -200,27 +332,33 @@ def main():
     if not data:
         print("No data found. Exiting.")
         return
-        
-    # Generate Plots
-    # 1. Evolution at r=3.0 (Typical dilemma)
-    # Find a suitable r if 3.0 is missing
-    target_r = 3.0
-    if target_r not in data:
-        available_rs = sorted(data.keys())
-        if available_rs:
-            # Pick one in the middle
-            target_r = available_rs[len(available_rs)//2]
-            print(f"r=3.0 not found, falling back to r={target_r}")
     
+    available_rs = sorted(data.keys())
+    print(f"Available r values: {available_rs}")
+    
+    # Select target r for single plots
+    target_r = 4.0  # Changed from 3.0 to 4.0
+    if target_r not in data and available_rs:
+        target_r = available_rs[len(available_rs)//2]
+        print(f"r=4.0 not found, using r={target_r}")
+    
+    # Generate Original 3 Plots (focused on r=4.0 or middle value)
+    print("\nGenerating focused plots...")
     plot_cooperation_evolution(data, target_r=target_r, output_dir=output_dir)
-    
-    # 2. Robustness across all r
     plot_robustness_analysis(data, output_dir=output_dir)
-    
-    # 3. Lambda impact at r=3.0 (or fallback)
     plot_lambda_impact(data, target_r=target_r, output_dir=output_dir)
     
-    print(f"All plots saved to {output_dir}")
+    # Generate NEW plots (covering multiple r values)
+    print("\nGenerating comprehensive plots...")
+    plot_evolution_grid(data, output_dir=output_dir)
+    plot_heatmap_comparison(data, output_dir=output_dir)
+    
+    print(f"\n✅ All 5 plots saved to {output_dir}/")
+    print("  1. Evolution Comparison (single r)")
+    print("  2. Robustness Analysis (all r)")
+    print("  3. Lambda Impact (single r)")
+    print("  4. Evolution Grid (multiple r) 🆕")
+    print("  5. Heatmap Comparison (all r×λ) 🆕")
 
 if __name__ == "__main__":
     main()

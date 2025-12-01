@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dqn_lambda: [0.0, 0.1, 0.3, 0.5]
+        dqn_lambda: [0.0, 0.3, 0.6, 1.0]  # Cover both boundaries: pure Q-table (0) and pure DQN (1)
         r_chunk: [A, B, C, D]
       fail-fast: false
       
@@ -43,7 +43,8 @@ jobs:
         python run_experiment.py \
           --r $R_VALUES \
           --dqn_lambda ${{ matrix.dqn_lambda }} \
-          --iterations 1000 \
+          --iterations 100000 \
+          --influence_factor 0.0 \
           --state_type reputation \
           --parallel \
           --output_dir results

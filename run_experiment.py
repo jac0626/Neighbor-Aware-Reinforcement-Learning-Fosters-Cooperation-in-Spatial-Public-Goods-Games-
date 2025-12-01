@@ -79,6 +79,12 @@ def main():
         config_dict['r'] = r_val
         config_dict['influence_factor'] = inf_val
         config_dict['dqn_lambda'] = lam_val
+        # Automatically enable DQN if lambda > 0
+        if lam_val > 0.0:
+            config_dict['use_dqn'] = True
+        else:
+            config_dict['use_dqn'] = False
+            
         if args.iterations:
             config_dict['iterations'] = args.iterations
         config = SimulationConfig.from_dict(config_dict)

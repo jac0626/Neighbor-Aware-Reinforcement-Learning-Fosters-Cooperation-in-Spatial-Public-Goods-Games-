@@ -16,7 +16,7 @@ class SimulationConfig:
     # Game parameters
     r: float = 2.0
     c: float = 1.0
-    cost: float = 0.5
+    cost: float = 1.0
     
     # Simulation parameters
     iterations: int = 1000
