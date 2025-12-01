@@ -8,7 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        r: [2.5, 3.0, 3.5, 4.0]
         dqn_lambda: [0.0, 0.1, 0.3, 0.5]
       fail-fast: false
       
@@ -25,25 +24,25 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         
-    - name: Run Simulation
+    - name: Run Simulation (Multi-Core)
       run: |
-        # Use smaller grid and fewer iterations for speed
-        # L=30, Iterations=100000
-        # Modify config.py on the fly or pass args if supported
-        # We don't have L arg exposed, but 50x50 is fine for 100000 iters.
-        # Let's stick to default L=50 but reduce iterations.
+        # 4-Core Runner Optimization
+        # We run a fine-grained sweep of r values in parallel on this runner.
+        # r range: 2.0 to 4.4 (step 0.2) -> 13 simulations
+        # With 4 cores, this will take ~4 batches.
         
         python run_experiment.py \
-          --r ${{ matrix.r }} \
+          --r 2.0 2.2 2.4 2.6 2.8 3.0 3.2 3.4 3.6 3.8 4.0 4.2 4.4 \
           --dqn_lambda ${{ matrix.dqn_lambda }} \
           --iterations 100000 \
           --state_type reputation \
+          --parallel \
           --output_dir results
           
     - name: Upload Results
       uses: actions/upload-artifact@v4
       with:
-        name: results-r${{ matrix.r }}-lam${{ matrix.dqn_lambda }}
+        name: results-lam${{ matrix.dqn_lambda }}
         path: results/
 
   plot:
