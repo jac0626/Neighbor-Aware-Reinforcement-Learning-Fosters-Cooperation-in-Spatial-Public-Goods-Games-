@@ -56,6 +56,10 @@ def main():
     parser.add_argument("--influence_factor", type=float, nargs="+", help="Override influence_factor values")
     parser.add_argument("--iterations", type=int, help="Override number of iterations")
     parser.add_argument("--dqn_lambda", type=float, nargs="+", help="Override dqn_lambda values")
+    parser.add_argument("--use_soft_update", action="store_true", help="Use soft update for DQN target network")
+    parser.add_argument("--dqn_tau", type=float, help="Tau parameter for soft update")
+    parser.add_argument("--seed", type=int, help="Random seed")
+    parser.add_argument("--L", type=int, help="Grid size")
     
     args = parser.parse_args()
     
@@ -74,19 +78,29 @@ def main():
     tasks = []
     for r_val, inf_val, lam_val in product(r_list, inf_list, lambda_list):
         # Create a copy of config with updated values
-        # Note: dataclass replace is cleaner but manual dict update works too
         config_dict = base_config.to_dict()
         config_dict['r'] = r_val
         config_dict['influence_factor'] = inf_val
         config_dict['dqn_lambda'] = lam_val
+        
         # Automatically enable DQN if lambda > 0
         if lam_val > 0.0:
             config_dict['use_dqn'] = True
         else:
             config_dict['use_dqn'] = False
-            
+        
+        # Override with command-line arguments
         if args.iterations:
             config_dict['iterations'] = args.iterations
+        if args.use_soft_update:
+            config_dict['use_soft_update'] = True
+        if args.dqn_tau is not None:
+            config_dict['dqn_tau'] = args.dqn_tau
+        if args.seed is not None:
+            config_dict['seed'] = args.seed
+        if args.L is not None:
+            config_dict['L'] = args.L
+            
         config = SimulationConfig.from_dict(config_dict)
         
         folder_name = os.path.join(args.output_dir, f"r{r_val}_inf{inf_val}_lam{lam_val}_{args.state_type}")
