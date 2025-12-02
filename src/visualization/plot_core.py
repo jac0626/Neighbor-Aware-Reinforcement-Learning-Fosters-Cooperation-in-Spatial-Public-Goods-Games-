@@ -378,36 +378,54 @@ def plot_heatmap_comparison(data, output_dir):
     print("Generated Plot 5: Performance-Stability Dual Heatmap")
 
 def main():
-    results_dir = "all_results" # Folder where artifacts are downloaded
-    output_dir = "proposal_plots"
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', nargs='+', required=False, default=['all_results'], 
+                       help='Input directories with experiment results')
+    parser.add_argument('--output', default='proposal_plots', help='Output directory for plots')
+    args = parser.parse_args()
+    
+    output_dir = args.output
     os.makedirs(output_dir, exist_ok=True)
     
     print("Loading data...")
-    data = load_data(results_dir)
+    # Load data from all input directories
+    all_data = {}
+    for input_dir in args.input:
+        print(f"Scanning {input_dir}...")
+        dir_data = load_data(input_dir)
+        # Merge data
+        for r in dir_data:
+            if r not in all_data:
+                all_data[r] = {}
+            for lam in dir_data[r]:
+                if lam not in all_data[r]:
+                    all_data[r][lam] = []
+                all_data[r][lam].extend(dir_data[r][lam])
     
-    if not data:
+    if not all_data:
         print("No data found. Exiting.")
         return
     
-    available_rs = sorted(data.keys())
+    available_rs = sorted(all_data.keys())
     print(f"Available r values: {available_rs}")
     
     # Select target r for single plots
     target_r = 4.0  # Changed from 3.0 to 4.0
-    if target_r not in data and available_rs:
+    if target_r not in all_data and available_rs:
         target_r = available_rs[len(available_rs)//2]
         print(f"r=4.0 not found, using r={target_r}")
     
     # Generate Original 3 Plots (focused on r=4.0 or middle value)
     print("\nGenerating focused plots...")
-    plot_cooperation_evolution(data, target_r=target_r, output_dir=output_dir)
-    plot_robustness_analysis(data, output_dir=output_dir)
-    plot_lambda_impact(data, target_r=target_r, output_dir=output_dir)
+    plot_cooperation_evolution(all_data, target_r=target_r, output_dir=output_dir)
+    plot_robustness_analysis(all_data, output_dir=output_dir)
+    plot_lambda_impact(all_data, target_r=target_r, output_dir=output_dir)
     
     # Generate NEW plots (covering multiple r values)
     print("\nGenerating comprehensive plots...")
-    plot_evolution_grid(data, output_dir=output_dir)
-    plot_heatmap_comparison(data, output_dir=output_dir)
+    plot_evolution_grid(all_data, output_dir=output_dir)
+    plot_heatmap_comparison(all_data, output_dir=output_dir)
     
     print(f"\n✅ All 5 plots saved to {output_dir}/")
     print("  1. Evolution Comparison (single r)")
