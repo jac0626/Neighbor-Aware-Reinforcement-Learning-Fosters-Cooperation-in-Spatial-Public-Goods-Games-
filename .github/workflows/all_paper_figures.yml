@@ -328,14 +328,20 @@ jobs:
         echo "Running Exp3 - ${{ matrix.exp_type }}"
         
         if [ "${{ matrix.exp_type }}" = "update_comparison" ]; then
-          USE_SOFT=${{ matrix.use_soft_update }}
+          # Conditionally add --use_soft_update flag
+          if [ "${{ matrix.use_soft_update }}" = "true" ]; then
+            SOFT_UPDATE_FLAG="--use_soft_update"
+          else
+            SOFT_UPDATE_FLAG=""
+          fi
+          
           python run_experiment.py \
             --r ${{ matrix.r }} \
             --dqn_lambda ${{ matrix.dqn_lambda }} \
             --seed ${{ matrix.seed }} \
             --iterations 1000 \
             --influence_factor 0.0 \
-            --use_soft_update $USE_SOFT \
+            $SOFT_UPDATE_FLAG \
             --dqn_tau 0.005 \
             --output_dir exp3_results
         else
