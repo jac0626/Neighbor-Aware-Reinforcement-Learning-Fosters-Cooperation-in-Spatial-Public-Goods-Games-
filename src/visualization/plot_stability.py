@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Plot stability analysis results (Fig 6-7)."""
+"""Plot stability analysis (Fig 6-7)."""
 import argparse
 import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.visualization.plot_utils import setup_matplotlib_for_publication
 
 def main():

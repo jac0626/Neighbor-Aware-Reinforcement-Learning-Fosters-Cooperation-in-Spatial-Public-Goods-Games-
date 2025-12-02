@@ -1,8 +1,12 @@
 import os
+import sys
 import glob
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.visualization.plot_utils import setup_matplotlib_for_publication
 
 def load_data(results_dir):
