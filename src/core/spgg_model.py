@@ -363,8 +363,18 @@ class SPGG:
                     self.optimizer.step()
                     
                 # Update Target Network
-                if i % self.config.dqn_target_update_freq == 0:
-                    self.dqn_target.load_state_dict(self.dqn.state_dict())
+                if self.config.use_soft_update:
+                    # Soft Update: θ_target = τ * θ_online + (1-τ) * θ_target
+                    # Smooth transition, every training step
+                    tau = self.config.dqn_tau
+                    for target_param, online_param in zip(self.dqn_target.parameters(), self.dqn.parameters()):
+                        target_param.data.copy_(tau * online_param.data + (1.0 - tau) * target_param.data)
+                else:
+                    # Hard Update: θ_target = θ_online (original approach)
+                    # Sudden change, every N iterations
+                    if i % self.config.dqn_target_update_freq == 0:
+                        self.dqn_target.load_state_dict(self.dqn.state_dict())
+
 
             # Neighbor Influence (NI)
             if self.config.use_second_order:

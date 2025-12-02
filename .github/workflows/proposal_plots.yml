@@ -6,6 +6,7 @@ on:
 jobs:
   simulate:
     runs-on: ubuntu-latest
+    timeout-minutes: 120  # 2 hour safety limit per job (4x expected time)
     strategy:
       matrix:
         dqn_lambda: [0.0, 0.3, 0.6, 1.0]  # Cover both boundaries: pure Q-table (0) and pure DQN (1)
@@ -58,6 +59,8 @@ jobs:
   plot:
     needs: simulate
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # Plot generation should be quick
+
     
     steps:
     - uses: actions/checkout@v4

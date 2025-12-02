@@ -1,0 +1,532 @@
+name: Generate All Paper Figures
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_experiments:
+        description: 'Which experiments to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - exp1_only
+          - exp1_2
+          - exp1_2_3
+
+jobs:
+  # ============================================================================
+  # EXPERIMENT 1: Core Performance Comparison (Fig 1-3)
+  # ============================================================================
+  exp1_core_performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      matrix:
+        dqn_lambda: [0.0, 0.3, 0.6, 1.0]
+        r_chunk: [A, B, C, D]
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Run Core Performance Experiment
+      run: |
+        case ${{ matrix.r_chunk }} in
+          A) R_VALUES="2.0 2.2 2.4 2.6" ;;
+          B) R_VALUES="2.8 3.0 3.2 3.4" ;;
+          C) R_VALUES="3.6 3.8 4.0 4.2" ;;
+          D) R_VALUES="4.4" ;;
+        esac
+        
+        echo "Running Exp1 - chunk ${{ matrix.r_chunk }}, lambda=${{ matrix.dqn_lambda }}"
+        
+        python run_experiment.py \
+          --r $R_VALUES \
+          --dqn_lambda ${{ matrix.dqn_lambda }} \
+          --iterations 100000 \
+          --influence_factor 0.0 \
+          --state_type reputation \
+          --use_soft_update \
+          --dqn_tau 0.005 \
+          --parallel \
+          --output_dir exp1_results
+    
+    - name: Upload Exp1 Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: exp1-lam${{ matrix.dqn_lambda }}-chunk${{ matrix.r_chunk }}
+        path: exp1_results/
+        retention-days: 7
+
+  # ============================================================================
+  # EXPERIMENT 2: Ablation Studies (Fig 4-5)
+  # ============================================================================
+  exp2_ablation:
+    runs-on: ubuntu-latest
+    needs: exp1_core_performance
+    if: ${{ github.event.inputs.run_experiments == 'all' || github.event.inputs.run_experiments == 'exp1_2' || github.event.inputs.run_experiments == 'exp1_2_3' }}
+    timeout-minutes: 90
+    strategy:
+      matrix:
+        include:
+          # Feature ablation (16 jobs)
+          - exp_type: feature_ablation
+            feature_set: full
+            r: 2.6
+            seed: 42
+          - exp_type: feature_ablation
+            feature_set: full
+            r: 2.6
+            seed: 123
+          - exp_type: feature_ablation
+            feature_set: full
+            r: 4.0
+            seed: 42
+          - exp_type: feature_ablation
+            feature_set: full
+            r: 4.0
+            seed: 123
+          - exp_type: feature_ablation
+            feature_set: no_rep
+            r: 2.6
+            seed: 42
+          - exp_type: feature_ablation
+            feature_set: no_rep
+            r: 2.6
+            seed: 123
+          - exp_type: feature_ablation
+            feature_set: no_rep
+            r: 4.0
+            seed: 42
+          - exp_type: feature_ablation
+            feature_set: no_rep
+            r: 4.0
+            seed: 123
+          - exp_type: feature_ablation
+            feature_set: no_neighbor
+            r: 2.6
+            seed: 42
+          - exp_type: feature_ablation
+            feature_set: no_neighbor
+            r: 2.6
+            seed: 123
+          - exp_type: feature_ablation
+            feature_set: no_neighbor
+            r: 4.0
+            seed: 42
+          - exp_type: feature_ablation
+            feature_set: no_neighbor
+            r: 4.0
+            seed: 123
+          - exp_type: feature_ablation
+            feature_set: only_payoff
+            r: 2.6
+            seed: 42
+          - exp_type: feature_ablation
+            feature_set: only_payoff
+            r: 2.6
+            seed: 123
+          - exp_type: feature_ablation
+            feature_set: only_payoff
+            r: 4.0
+            seed: 42
+          - exp_type: feature_ablation
+            feature_set: only_payoff
+            r: 4.0
+            seed: 123
+          # Lambda sweep (11 jobs)
+          - exp_type: lambda_sweep
+            dqn_lambda: 0.0
+            r: 4.0
+            seed: 42
+          - exp_type: lambda_sweep
+            dqn_lambda: 0.1
+            r: 4.0
+            seed: 42
+          - exp_type: lambda_sweep
+            dqn_lambda: 0.2
+            r: 4.0
+            seed: 42
+          - exp_type: lambda_sweep
+            dqn_lambda: 0.3
+            r: 4.0
+            seed: 42
+          - exp_type: lambda_sweep
+            dqn_lambda: 0.4
+            r: 4.0
+            seed: 42
+          - exp_type: lambda_sweep
+            dqn_lambda: 0.5
+            r: 4.0
+            seed: 42
+          - exp_type: lambda_sweep
+            dqn_lambda: 0.6
+            r: 4.0
+            seed: 42
+          - exp_type: lambda_sweep
+            dqn_lambda: 0.7
+            r: 4.0
+            seed: 42
+          - exp_type: lambda_sweep
+            dqn_lambda: 0.8
+            r: 4.0
+            seed: 42
+          - exp_type: lambda_sweep
+            dqn_lambda: 0.9
+            r: 4.0
+            seed: 42
+          - exp_type: lambda_sweep
+            dqn_lambda: 1.0
+            r: 4.0
+            seed: 42
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Run Ablation Experiment
+      run: |
+        echo "Running Exp2 - ${{ matrix.exp_type }}"
+        
+        if [ "${{ matrix.exp_type }}" = "feature_ablation" ]; then
+          python experiments/run_feature_ablation.py \
+            --feature_set ${{ matrix.feature_set }} \
+            --r ${{ matrix.r }} \
+            --seed ${{ matrix.seed }} \
+            --iterations 50000 \
+            --output_dir exp2_results
+        else
+          python run_experiment.py \
+            --r ${{ matrix.r }} \
+            --dqn_lambda ${{ matrix.dqn_lambda }} \
+            --seed ${{ matrix.seed }} \
+            --iterations 100000 \
+            --influence_factor 0.0 \
+            --output_dir exp2_results
+        fi
+    
+    - name: Upload Exp2 Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: exp2-${{ matrix.exp_type }}-${{ matrix.feature_set || matrix.dqn_lambda }}-r${{ matrix.r }}-seed${{ matrix.seed }}
+        path: exp2_results/
+        retention-days: 7
+
+  # ============================================================================
+  # EXPERIMENT 3: Stability Analysis (Fig 6-7)
+  # ============================================================================
+  exp3_stability:
+    runs-on: ubuntu-latest
+    needs: exp2_ablation
+    if: ${{ github.event.inputs.run_experiments == 'all' || github.event.inputs.run_experiments == 'exp1_2_3' }}
+    timeout-minutes: 90
+    strategy:
+      matrix:
+        include:
+          # Hard vs Soft update (6 jobs)
+          - exp_type: update_comparison
+            use_soft_update: false
+            r: 4.0
+            dqn_lambda: 1.0
+            seed: 42
+          - exp_type: update_comparison
+            use_soft_update: false
+            r: 4.0
+            dqn_lambda: 1.0
+            seed: 123
+          - exp_type: update_comparison
+            use_soft_update: false
+            r: 4.0
+            dqn_lambda: 1.0
+            seed: 456
+          - exp_type: update_comparison
+            use_soft_update: true
+            r: 4.0
+            dqn_lambda: 1.0
+            seed: 42
+          - exp_type: update_comparison
+            use_soft_update: true
+            r: 4.0
+            dqn_lambda: 1.0
+            seed: 123
+          - exp_type: update_comparison
+            use_soft_update: true
+            r: 4.0
+            dqn_lambda: 1.0
+            seed: 456
+          # Tau sweep (8 jobs)
+          - exp_type: tau_sweep
+            dqn_tau: 0.001
+            r: 4.0
+            seed: 42
+          - exp_type: tau_sweep
+            dqn_tau: 0.001
+            r: 4.0
+            seed: 123
+          - exp_type: tau_sweep
+            dqn_tau: 0.005
+            r: 4.0
+            seed: 42
+          - exp_type: tau_sweep
+            dqn_tau: 0.005
+            r: 4.0
+            seed: 123
+          - exp_type: tau_sweep
+            dqn_tau: 0.01
+            r: 4.0
+            seed: 42
+          - exp_type: tau_sweep
+            dqn_tau: 0.01
+            r: 4.0
+            seed: 123
+          - exp_type: tau_sweep
+            dqn_tau: 0.02
+            r: 4.0
+            seed: 42
+          - exp_type: tau_sweep
+            dqn_tau: 0.02
+            r: 4.0
+            seed: 123
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Run Stability Experiment
+      run: |
+        echo "Running Exp3 - ${{ matrix.exp_type }}"
+        
+        if [ "${{ matrix.exp_type }}" = "update_comparison" ]; then
+          USE_SOFT=${{ matrix.use_soft_update }}
+          python run_experiment.py \
+            --r ${{ matrix.r }} \
+            --dqn_lambda ${{ matrix.dqn_lambda }} \
+            --seed ${{ matrix.seed }} \
+            --iterations 100000 \
+            --influence_factor 0.0 \
+            --use_soft_update $USE_SOFT \
+            --dqn_tau 0.005 \
+            --output_dir exp3_results
+        else
+          python run_experiment.py \
+            --r ${{ matrix.r }} \
+            --dqn_lambda 1.0 \
+            --seed ${{ matrix.seed }} \
+            --iterations 100000 \
+            --influence_factor 0.0 \
+            --use_soft_update \
+            --dqn_tau ${{ matrix.dqn_tau }} \
+            --output_dir exp3_results
+        fi
+    
+    - name: Upload Exp3 Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: exp3-${{ matrix.exp_type }}-${{ matrix.use_soft_update || matrix.dqn_tau }}-seed${{ matrix.seed }}
+        path: exp3_results/
+        retention-days: 7
+
+  # ============================================================================
+  # EXPERIMENT 4: R-dependency Landscape (Fig 8-9)
+  # ============================================================================
+  exp4_landscape:
+    runs-on: ubuntu-latest
+    needs: exp1_core_performance
+    if: ${{ github.event.inputs.run_experiments == 'all' }}
+    timeout-minutes: 90
+    strategy:
+      matrix:
+        r: [2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2, 4.4]
+        dqn_lambda: [0.6, 1.0]
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Run Landscape Experiment
+      run: |
+        echo "Running Exp4 - r=${{ matrix.r }}, lambda=${{ matrix.dqn_lambda }}"
+        
+        python run_experiment.py \
+          --r ${{ matrix.r }} \
+          --dqn_lambda ${{ matrix.dqn_lambda }} \
+          --iterations 100000 \
+          --influence_factor 0.0 \
+          --use_soft_update \
+          --dqn_tau 0.005 \
+          --output_dir exp4_results
+    
+    - name: Upload Exp4 Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: exp4-r${{ matrix.r }}-lam${{ matrix.dqn_lambda }}
+        path: exp4_results/
+        retention-days: 7
+
+  # ============================================================================
+  # EXPERIMENT 5: Scalability Test (Fig 10)
+  # ============================================================================
+  exp5_scalability:
+    runs-on: ubuntu-latest
+    needs: exp1_core_performance
+    if: ${{ github.event.inputs.run_experiments == 'all' }}
+    timeout-minutes: 180
+    strategy:
+      matrix:
+        L: [50, 100, 150, 200]
+        dqn_lambda: [0.0, 0.6, 1.0]
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Run Scalability Experiment
+      run: |
+        echo "Running Exp5 - L=${{ matrix.L }}, lambda=${{ matrix.dqn_lambda }}"
+        
+        python run_experiment.py \
+          --L ${{ matrix.L }} \
+          --r 4.0 \
+          --dqn_lambda ${{ matrix.dqn_lambda }} \
+          --iterations 50000 \
+          --influence_factor 0.0 \
+          --use_soft_update \
+          --dqn_tau 0.005 \
+          --output_dir exp5_results
+    
+    - name: Upload Exp5 Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: exp5-L${{ matrix.L }}-lam${{ matrix.dqn_lambda }}
+        path: exp5_results/
+        retention-days: 7
+
+  # ============================================================================
+  # PLOT GENERATION: Assemble all figures
+  # ============================================================================
+  generate_all_plots:
+    needs: [exp1_core_performance, exp2_ablation, exp3_stability, exp4_landscape, exp5_scalability]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: always()
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Download All Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: all_experiments/
+    
+    - name: Generate All Figures
+      run: |
+        export PYTHONPATH=$PYTHONPATH:.
+        mkdir -p paper_figures
+        
+        echo "Generating figures..."
+        
+        # Fig 1-3: Core performance
+        python src/visualization/plot_core.py --input all_experiments/exp1-* --output paper_figures/
+        
+        # Fig 4-5: Ablation
+        python src/visualization/plot_ablation.py --input all_experiments/exp2-* --output paper_figures/
+        
+        # Fig 6-7: Stability
+        python src/visualization/plot_stability.py --input all_experiments/exp3-* --output paper_figures/
+        
+        # Fig 8-9: Landscape
+        python src/visualization/plot_landscape.py --input all_experiments/exp4-* --output paper_figures/
+        
+        # Fig 10: Scalability
+        python src/visualization/plot_scalability.py --input all_experiments/exp5-* --output paper_figures/
+        
+        # Generate README
+        cat > paper_figures/README.md << 'EOF'
+        # Paper Figures
+
+        This directory contains all 10 figures for the research paper.
+
+        Generated: $(date)
+        
+        ## Figure List
+        - Fig 1: Evolution Grid (4x2 subplots showing cooperation evolution)
+        - Fig 2: Performance Heatmap (mean cooperation rate across r and λ)
+        - Fig 3: Performance-Stability Tradeoff (scatter plot)
+        - Fig 4: Feature Ablation (bar chart showing feature importance)
+        - Fig 5: Lambda Sweep (fine-grained λ impact)
+        - Fig 6: Hard vs Soft Update Comparison
+        - Fig 7: Tau Parameter Optimization
+        - Fig 8: Stability Landscape (std vs r for different λ)
+        - Fig 9: Critical Point Analysis (zoom into r=2.4-2.8)
+        - Fig 10: Scalability Analysis (performance vs grid size)
+        
+        All figures are 300 DPI PNG, suitable for publication.
+        EOF
+    
+    - name: Upload Paper Figures
+      uses: actions/upload-artifact@v4
+      with:
+        name: paper-figures
+        path: paper_figures/
+        retention-days: 30
