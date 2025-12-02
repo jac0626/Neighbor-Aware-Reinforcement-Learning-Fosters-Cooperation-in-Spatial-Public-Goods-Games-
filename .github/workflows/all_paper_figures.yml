@@ -54,7 +54,7 @@ jobs:
         python run_experiment.py \
           --r $R_VALUES \
           --dqn_lambda ${{ matrix.dqn_lambda }} \
-          --iterations 100000 \
+          --iterations 1000 \
           --influence_factor 0.0 \
           --state_type reputation \
           --use_soft_update \
@@ -214,14 +214,14 @@ jobs:
             --feature_set ${{ matrix.feature_set }} \
             --r ${{ matrix.r }} \
             --seed ${{ matrix.seed }} \
-            --iterations 50000 \
+            --iterations 1000 \
             --output_dir exp2_results
         else
           python run_experiment.py \
             --r ${{ matrix.r }} \
             --dqn_lambda ${{ matrix.dqn_lambda }} \
             --seed ${{ matrix.seed }} \
-            --iterations 100000 \
+            --iterations 1000 \
             --influence_factor 0.0 \
             --output_dir exp2_results
         fi
@@ -333,7 +333,7 @@ jobs:
             --r ${{ matrix.r }} \
             --dqn_lambda ${{ matrix.dqn_lambda }} \
             --seed ${{ matrix.seed }} \
-            --iterations 100000 \
+            --iterations 1000 \
             --influence_factor 0.0 \
             --use_soft_update $USE_SOFT \
             --dqn_tau 0.005 \
@@ -343,7 +343,7 @@ jobs:
             --r ${{ matrix.r }} \
             --dqn_lambda 1.0 \
             --seed ${{ matrix.seed }} \
-            --iterations 100000 \
+            --iterations 1000 \
             --influence_factor 0.0 \
             --use_soft_update \
             --dqn_tau ${{ matrix.dqn_tau }} \
@@ -391,7 +391,7 @@ jobs:
         python run_experiment.py \
           --r ${{ matrix.r }} \
           --dqn_lambda ${{ matrix.dqn_lambda }} \
-          --iterations 100000 \
+          --iterations 1000 \
           --influence_factor 0.0 \
           --use_soft_update \
           --dqn_tau 0.005 \
@@ -439,7 +439,7 @@ jobs:
           --L ${{ matrix.L }} \
           --r 4.0 \
           --dqn_lambda ${{ matrix.dqn_lambda }} \
-          --iterations 50000 \
+          --iterations 1000 \
           --influence_factor 0.0 \
           --use_soft_update \
           --dqn_tau 0.005 \
