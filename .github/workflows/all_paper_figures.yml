@@ -20,7 +20,6 @@ jobs:
   # ============================================================================
   exp1_core_performance:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
     strategy:
       matrix:
         dqn_lambda: [0.0, 0.3, 0.6, 1.0]
@@ -54,7 +53,7 @@ jobs:
         python run_experiment.py \
           --r $R_VALUES \
           --dqn_lambda ${{ matrix.dqn_lambda }} \
-          --iterations 1000 \
+          --iterations 100000 \
           --influence_factor 0.0 \
           --state_type reputation \
           --use_soft_update \
@@ -76,7 +75,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: exp1_core_performance
     if: ${{ github.event.inputs.run_experiments == 'all' || github.event.inputs.run_experiments == 'exp1_2' || github.event.inputs.run_experiments == 'exp1_2_3' }}
-    timeout-minutes: 90
     strategy:
       matrix:
         include:
@@ -214,14 +212,14 @@ jobs:
             --feature_set ${{ matrix.feature_set }} \
             --r ${{ matrix.r }} \
             --seed ${{ matrix.seed }} \
-            --iterations 1000 \
+            --iterations 100000 \
             --output_dir exp2_results
         else
           python run_experiment.py \
             --r ${{ matrix.r }} \
             --dqn_lambda ${{ matrix.dqn_lambda }} \
             --seed ${{ matrix.seed }} \
-            --iterations 1000 \
+            --iterations 100000 \
             --influence_factor 0.0 \
             --output_dir exp2_results
         fi
@@ -240,7 +238,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: exp2_ablation
     if: ${{ github.event.inputs.run_experiments == 'all' || github.event.inputs.run_experiments == 'exp1_2_3' }}
-    timeout-minutes: 90
     strategy:
       matrix:
         include:
@@ -339,7 +336,7 @@ jobs:
             --r ${{ matrix.r }} \
             --dqn_lambda ${{ matrix.dqn_lambda }} \
             --seed ${{ matrix.seed }} \
-            --iterations 1000 \
+            --iterations 100000 \
             --influence_factor 0.0 \
             $SOFT_UPDATE_FLAG \
             --dqn_tau 0.005 \
@@ -349,7 +346,7 @@ jobs:
             --r ${{ matrix.r }} \
             --dqn_lambda 1.0 \
             --seed ${{ matrix.seed }} \
-            --iterations 1000 \
+            --iterations 100000 \
             --influence_factor 0.0 \
             --use_soft_update \
             --dqn_tau ${{ matrix.dqn_tau }} \
@@ -370,7 +367,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: exp1_core_performance
     if: ${{ github.event.inputs.run_experiments == 'all' }}
-    timeout-minutes: 90
     strategy:
       matrix:
         r: [2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2, 4.4]
@@ -397,7 +393,7 @@ jobs:
         python run_experiment.py \
           --r ${{ matrix.r }} \
           --dqn_lambda ${{ matrix.dqn_lambda }} \
-          --iterations 1000 \
+          --iterations 100000 \
           --influence_factor 0.0 \
           --use_soft_update \
           --dqn_tau 0.005 \
@@ -417,7 +413,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: exp1_core_performance
     if: ${{ github.event.inputs.run_experiments == 'all' }}
-    timeout-minutes: 180
     strategy:
       matrix:
         L: [50, 100, 150, 200]
@@ -445,7 +440,7 @@ jobs:
           --L ${{ matrix.L }} \
           --r 4.0 \
           --dqn_lambda ${{ matrix.dqn_lambda }} \
-          --iterations 1000 \
+          --iterations 100000 \
           --influence_factor 0.0 \
           --use_soft_update \
           --dqn_tau 0.005 \
@@ -464,7 +459,6 @@ jobs:
   generate_all_plots:
     needs: [exp1_core_performance, exp2_ablation, exp3_stability, exp4_landscape, exp5_scalability]
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     if: always()
     
     steps:
