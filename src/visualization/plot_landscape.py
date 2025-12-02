@@ -4,7 +4,7 @@ import argparse
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from plot_utils import setup_matplotlib_for_publication
+from src.visualization.plot_utils import setup_matplotlib_for_publication
 
 def main():
     parser = argparse.ArgumentParser()

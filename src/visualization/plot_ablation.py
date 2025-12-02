@@ -7,6 +7,7 @@ import glob
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
+from src.visualization.plot_utils import setup_matplotlib_for_publication
 
 def main():
     parser = argparse.ArgumentParser()
