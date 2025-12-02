@@ -263,10 +263,15 @@ def plot_evolution_grid(data, output_dir):
 
 def plot_heatmap_comparison(data, output_dir):
     """
-    Plot 5: Heatmap showing final cooperation rate for all (r, lambda) combinations.
+    Plot 5: Dual Heatmap showing performance (mean) and stability (std) for all (r, lambda) combinations.
+    Uses last 1000 iterations to avoid random endpoint effects in oscillating systems.
     """
     setup_matplotlib_for_publication()
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+    fig = plt.figure(figsize=(16, 6))
+    gs = fig.add_gridspec(1, 3, width_ratios=[1, 1, 0.8], wspace=0.4)
+    ax1 = fig.add_subplot(gs[0])
+    ax2 = fig.add_subplot(gs[1])
+    ax3 = fig.add_subplot(gs[2])
     
     r_values = sorted(data.keys())
     all_lambdas = set()
@@ -274,52 +279,103 @@ def plot_heatmap_comparison(data, output_dir):
         all_lambdas.update(data[r].keys())
     lambda_values = sorted(all_lambdas)
     
-    # Create matrix for final cooperation rates
-    coop_matrix = np.zeros((len(lambda_values), len(r_values)))
+    # Create matrices for performance (mean) and stability (std)
+    performance_matrix = np.zeros((len(lambda_values), len(r_values)))
+    stability_matrix = np.zeros((len(lambda_values), len(r_values)))
+    
+    window = 1000  # Last N iterations for stable measurement
     
     for i, lam in enumerate(lambda_values):
         for j, r in enumerate(r_values):
             if lam in data[r]:
-                final_coop = np.mean([run[-1] for run in data[r][lam]])
-                coop_matrix[i, j] = final_coop
+                runs = data[r][lam]
+                # Calculate mean and std over last 'window' iterations
+                stable_values = []
+                std_values = []
+                for run in runs:
+                    if len(run) >= window:
+                        stable_values.append(np.mean(run[-window:]))
+                        std_values.append(np.std(run[-window:]))
+                    else:
+                        stable_values.append(np.mean(run))
+                        std_values.append(np.std(run))
+                
+                performance_matrix[i, j] = np.mean(stable_values)
+                stability_matrix[i, j] = np.mean(std_values)
             else:
-                coop_matrix[i, j] = np.nan
+                performance_matrix[i, j] = np.nan
+                stability_matrix[i, j] = np.nan
     
-    # Plot 1: Heatmap
-    im1 = ax1.imshow(coop_matrix, aspect='auto', cmap='RdYlGn', vmin=0, vmax=1)
+    # Plot 1: Performance Heatmap (Mean Cooperation Rate)
+    im1 = ax1.imshow(performance_matrix, aspect='auto', cmap='RdYlGn', vmin=0, vmax=1)
     ax1.set_xticks(range(len(r_values)))
-    ax1.set_xticklabels([f'{r:.1f}' for r in r_values], rotation=45)
+    ax1.set_xticklabels([f'{r:.1f}' for r in r_values], rotation=45, ha='right')
     ax1.set_yticks(range(len(lambda_values)))
     ax1.set_yticklabels([f'{lam:.1f}' for lam in lambda_values])
     ax1.set_xlabel('Synergy Factor (r)', fontsize=12)
     ax1.set_ylabel('DQN Weight (λ)', fontsize=12)
-    ax1.set_title('Final Cooperation Rate Heatmap', fontsize=13, fontweight='bold')
+    ax1.set_title('Performance: Mean Cooperation Rate\n(Last 1000 Iterations)', fontsize=12, fontweight='bold')
     
     # Add text annotations
     for i in range(len(lambda_values)):
         for j in range(len(r_values)):
-            if not np.isnan(coop_matrix[i, j]):
-                text = ax1.text(j, i, f'{coop_matrix[i, j]:.2f}',
-                              ha="center", va="center", color="black", fontsize=8)
+            if not np.isnan(performance_matrix[i, j]):
+                text_color = 'white' if performance_matrix[i, j] < 0.5 else 'black'
+                ax1.text(j, i, f'{performance_matrix[i, j]:.2f}',
+                        ha="center", va="center", color=text_color, fontsize=9, fontweight='bold')
     
-    plt.colorbar(im1, ax=ax1, label='Cooperation Rate')
+    plt.colorbar(im1, ax=ax1, label='Mean Coop Rate', fraction=0.046)
     
-    # Plot 2: Line plot showing trends
-    for i, lam in enumerate(lambda_values):
-        y_vals = coop_matrix[i, :]
-        ax2.plot(r_values, y_vals, 'o-', label=f'λ={lam:.1f}', linewidth=2, markersize=6)
-    
+    # Plot 2: Stability Heatmap (Std of Cooperation Rate)
+    im2 = ax2.imshow(stability_matrix, aspect='auto', cmap='RdYlGn_r', vmin=0, vmax=0.3)  # Reversed: low std = good (green)
+    ax2.set_xticks(range(len(r_values)))
+    ax2.set_xticklabels([f'{r:.1f}' for r in r_values], rotation=45, ha='right')
+    ax2.set_yticks(range(len(lambda_values)))
+    ax2.set_yticklabels([f'{lam:.1f}' for lam in lambda_values])
     ax2.set_xlabel('Synergy Factor (r)', fontsize=12)
-    ax2.set_ylabel('Final Cooperation Rate', fontsize=12)
-    ax2.set_title('Cooperation vs Synergy by λ', fontsize=13, fontweight='bold')
-    ax2.legend(fontsize=10)
-    ax2.grid(True, alpha=0.3)
-    ax2.set_ylim(-0.05, 1.05)
+    ax2.set_ylabel('DQN Weight (λ)', fontsize=12)
+    ax2.set_title('Stability: Std of Cooperation Rate\n(Last 1000 Iterations)', fontsize=12, fontweight='bold')
+    
+    # Add text annotations
+    for i in range(len(lambda_values)):
+        for j in range(len(r_values)):
+            if not np.isnan(stability_matrix[i, j]):
+                text_color = 'white' if stability_matrix[i, j] > 0.15 else 'black'
+                ax2.text(j, i, f'{stability_matrix[i, j]:.3f}',
+                        ha="center", va="center", color=text_color, fontsize=9, fontweight='bold')
+    
+    plt.colorbar(im2, ax=ax2, label='Std (Lower=More Stable)', fraction=0.046)
+    
+    # Plot 3: Performance-Stability Scatter
+    # Each point is a (performance, stability) pair for a (r, lambda) combination
+    colors_lambda = plt.cm.viridis(np.linspace(0, 1, len(lambda_values)))
+    
+    for i, lam in enumerate(lambda_values):
+        perf_vals = performance_matrix[i, :]
+        stab_vals = stability_matrix[i, :]
+        # Filter out NaNs
+        valid = ~np.isnan(perf_vals) & ~np.isnan(stab_vals)
+        ax3.scatter(stab_vals[valid], perf_vals[valid], 
+                   label=f'λ={lam:.1f}', s=100, alpha=0.7, 
+                   color=colors_lambda[i], edgecolors='black', linewidths=1.5)
+    
+    ax3.set_xlabel('Instability (Std)', fontsize=12)
+    ax3.set_ylabel('Performance (Mean Coop)', fontsize=12)
+    ax3.set_title('Performance-Stability Tradeoff', fontsize=12, fontweight='bold')
+    ax3.legend(fontsize=9, loc='best')
+    ax3.grid(True, alpha=0.3)
+    ax3.set_xlim(-0.01, max(0.3, np.nanmax(stability_matrix) * 1.1))
+    ax3.set_ylim(-0.05, 1.05)
+    
+    # Add ideal zone annotation
+    ax3.axhspan(0.7, 1.0, xmax=0.1/ax3.get_xlim()[1], alpha=0.2, color='green', label='Ideal Zone')
+    ax3.text(0.02, 0.85, 'Ideal:\nHigh Performance\nLow Instability', 
+            fontsize=9, bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.5))
     
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, '5_heatmap_comparison.png'), dpi=300)
+    plt.savefig(os.path.join(output_dir, '5_heatmap_comparison.png'), dpi=300, bbox_inches='tight')
     plt.close()
-    print("Generated Plot 5: Heatmap Comparison")
+    print("Generated Plot 5: Performance-Stability Dual Heatmap")
 
 def main():
     results_dir = "all_results" # Folder where artifacts are downloaded

@@ -7,11 +7,10 @@ import glob
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
-from plot_utils import setup_matplotlib_for_publication
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input', required=True, help='Input directory with exp2 results')
+    parser.add_argument('--input', nargs='+', required=True, help='Input directories with exp2 results')
     parser.add_argument('--output', default='paper_figures/')
     args = parser.parse_args()
     

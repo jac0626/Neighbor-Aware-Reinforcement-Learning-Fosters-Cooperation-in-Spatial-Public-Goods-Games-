@@ -8,7 +8,7 @@ from plot_utils import setup_matplotlib_for_publication
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input', required=True)
+    parser.add_argument('--input', nargs='+', required=True)
     parser.add_argument('--output', default='paper_figures/')
     args = parser.parse_args()
     
