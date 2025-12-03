@@ -112,6 +112,7 @@ def plot_cooperation_evolution(data, target_r, output_dir):
     ax.legend()
     ax.grid(True, alpha=0.3)
     ax.set_ylim(-0.05, 1.05)
+    ax.set_xscale('log')  # Use log scale for better visibility of early dynamics
     
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, '1_evolution_comparison.png'), dpi=300)
@@ -139,15 +140,15 @@ def plot_robustness_analysis(data, output_dir):
         else:
             y_single.append(np.nan)
             
-        # Dual Brain (pick lambda=0.1 as representative)
-        if 0.1 in data[r]:
-            final_coop = np.mean([run[-1] for run in data[r][0.1]])
+        # Dual Brain (pick lambda=0.6 as representative)
+        if 0.6 in data[r]:
+            final_coop = np.mean([run[-1] for run in data[r][0.6]])
             y_dual_best.append(final_coop)
         else:
             y_dual_best.append(np.nan)
             
     ax.plot(r_values, y_single, 'o--', label='Single-Brain', color='gray', markersize=8)
-    ax.plot(r_values, y_dual_best, 's-', label='Dual-Brain ($\lambda=0.1$)', color='#d62728', markersize=8)
+    ax.plot(r_values, y_dual_best, 's-', label='Dual-Brain ($\\lambda=0.6$)', color='#d62728', markersize=8)
     
     ax.set_xlabel('Synergy Factor (r)')
     ax.set_ylabel('Final Cooperation Rate')
@@ -246,6 +247,7 @@ def plot_evolution_grid(data, output_dir):
         ax.legend(fontsize=9, loc='best')
         ax.grid(True, alpha=0.3)
         ax.set_ylim(-0.05, 1.05)
+        ax.set_xscale('log')  # Use log scale for better visibility
         
         # Add text annotation for difficulty
         if r_val == low_r:
