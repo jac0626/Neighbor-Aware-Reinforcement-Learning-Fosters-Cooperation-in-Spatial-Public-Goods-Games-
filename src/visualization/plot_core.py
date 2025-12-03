@@ -115,9 +115,61 @@ def plot_cooperation_evolution(data, target_r, output_dir):
     ax.set_xscale('log')  # Use log scale for better visibility of early dynamics
     
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, '1_evolution_comparison.png'), dpi=300)
+    plt.savefig(os.path.join(output_dir, '1a_evolution_log.png'), dpi=300)
     plt.close()
-    print("Generated Plot 1: Evolution Comparison")
+    print("Generated Plot 1a: Evolution (Log Scale)")
+    
+    # VERSION 2: Linear scale for long-term view
+    fig, ax = plt.subplots(figsize=(8, 6))
+    
+    if 0.0 in data[target_r]:
+        runs = data[target_r][0.0]
+        avg_run = np.mean(runs, axis=0)
+        ax.plot(avg_run, label='Single-Brain (λ=0)', color='gray', linestyle='--', linewidth=2)
+    
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+    for i, lam in enumerate(sorted([k for k in data[target_r].keys() if k > 0])):
+        runs = data[target_r][lam]
+        avg_run = np.mean(runs, axis=0)
+        ax.plot(avg_run, label=f'Dual-Brain ($\\lambda={lam}$)', color=colors[i % len(colors)], linewidth=2)
+    
+    ax.set_xlabel('Iterations')
+    ax.set_ylabel('Cooperation Rate')
+    ax.set_title(f'Cooperation Evolution - Linear Scale (r={target_r})')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.set_ylim(-0.05, 1.05)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, '1b_evolution_linear.png'), dpi=300)
+    plt.close()
+    print("Generated Plot 1b: Evolution (Linear Scale)")
+    
+    # VERSION 3: Key lambda comparison (cleaner)
+    fig, ax = plt.subplots(figsize=(8, 6))
+    key_lambdas = [0.0, 0.5, 1.0]
+    colors_key = ['gray', '#ff7f0e', '#2ca02c']
+    styles = ['--', '-', '-']
+    
+    for lam, color, style in zip(key_lambdas, colors_key, styles):
+        if lam in data[target_r]:
+            runs = data[target_r][lam]
+            avg_run = np.mean(runs, axis=0)
+            label = f'Single-Brain' if lam == 0.0 else f'Dual-Brain ($\\lambda={lam}$)'
+            ax.plot(avg_run, label=label, color=color, linestyle=style, linewidth=2.5)
+    
+    ax.set_xlabel('Iterations')
+    ax.set_ylabel('Cooperation Rate')
+    ax.set_title(f'Key Comparison: λ = 0, 0.5, 1.0 (r={target_r})')
+    ax.legend(fontsize=11)
+    ax.grid(True, alpha=0.3)
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_xscale('log')
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, '1c_evolution_key_comparison.png'), dpi=300)
+    plt.close()
+    print("Generated Plot 1c: Evolution (Key λ Comparison)")
 
 def plot_robustness_analysis(data, output_dir):
     """
@@ -158,9 +210,41 @@ def plot_robustness_analysis(data, output_dir):
     ax.set_ylim(-0.05, 1.05)
     
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, '2_robustness_analysis.png'), dpi=300)
+    plt.savefig(os.path.join(output_dir, '2a_robustness.png'), dpi=300)
     plt.close()
-    print("Generated Plot 2: Robustness Analysis")
+    print("Generated Plot 2a: Robustness Analysis")
+    
+    # VERSION 2: Multi-lambda robustness
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    lambda_vals = [0.0, 0.3, 0.6, 0.9]
+    colors_lambda = ['gray', '#1f77b4', '#ff7f0e', '#2ca02c']
+    markers = ['o', 's', '^', 'D']
+    
+    for lam, color, marker in zip(lambda_vals, colors_lambda, markers):
+        y_vals = []
+        for r in r_values:
+            if lam in data[r]:
+                final_coop = np.mean([run[-1] for run in data[r][lam]])
+                y_vals.append(final_coop)
+            else:
+                y_vals.append(np.nan)
+        
+        label = 'Single-Brain' if lam == 0.0 else f'Dual-Brain ($\\lambda={lam}$)'
+        ax.plot(r_values, y_vals, f'{marker}-', label=label, color=color, 
+                markersize=7, linewidth=2)
+    
+    ax.set_xlabel('Synergy Factor (r)', fontsize=12)
+    ax.set_ylabel('Final Cooperation Rate', fontsize=12)
+    ax.set_title('Robustness Across λ Values', fontsize=13, fontweight='bold')
+    ax.legend(fontsize=10)
+    ax.grid(True, alpha=0.3)
+    ax.set_ylim(-0.05, 1.05)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, '2b_robustness_multi_lambda.png'), dpi=300)
+    plt.close()
+    print("Generated Plot 2b: Multi-Lambda Robustness")
 
 def plot_lambda_impact(data, target_r, output_dir):
     """

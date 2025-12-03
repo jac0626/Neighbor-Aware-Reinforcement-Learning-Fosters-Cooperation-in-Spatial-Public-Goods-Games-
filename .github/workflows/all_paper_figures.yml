@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dqn_lambda: [0.0, 0.3, 0.6, 1.0]
+        dqn_lambda: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
         r_chunk: [A, B, C, D]
       fail-fast: false
     
