@@ -220,11 +220,19 @@ def plot_robustness_analysis(data, output_dir):
     # VERSION 2: Multi-lambda robustness
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    lambda_vals = [0.0, 0.3, 0.6, 0.9]
-    colors_lambda = ['gray', '#1f77b4', '#ff7f0e', '#2ca02c']
-    markers = ['o', 's', '^', 'D']
+    # Use all available lambda values or select key ones
+    all_lambdas = sorted(set().union(*[set(data[r].keys()) for r in r_values]))
+    # Select representative lambdas if too many
+    if len(all_lambdas) > 6:
+        lambda_vals = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+    else:
+        lambda_vals = all_lambdas
     
-    for lam, color, marker in zip(lambda_vals, colors_lambda, markers):
+    # Generate distinct colors
+    cmap = plt.cm.get_cmap('tab10', len(lambda_vals))
+    markers = ['o', 's', '^', 'D', 'v', '>', '<', 'p', '*', 'h']
+    
+    for i, lam in enumerate(lambda_vals):
         y_vals = []
         for r in r_values:
             if lam in data[r]:
@@ -233,9 +241,9 @@ def plot_robustness_analysis(data, output_dir):
             else:
                 y_vals.append(np.nan)
         
-        label = 'Single-Brain' if lam == 0.0 else f'Dual-Brain ($\\lambda={lam}$)'
-        ax.plot(r_values, y_vals, f'{marker}-', label=label, color=color, 
-                markersize=7, linewidth=2)
+        label = 'Single-Brain' if lam == 0.0 else f'Dual-Brain (λ={lam})'
+        ax.plot(r_values, y_vals, f'{markers[i % len(markers)]}-', label=label, 
+                color=cmap(i), markersize=7, linewidth=2)
     
     ax.set_xlabel('Synergy Factor (r)', fontsize=12)
     ax.set_ylabel('Final Cooperation Rate', fontsize=12)
@@ -266,9 +274,13 @@ def plot_lambda_impact(data, target_r, output_dir):
     for lam in lambdas:
         final_coop = np.mean([run[-1] for run in data[target_r][lam]])
         final_coops.append(final_coop)
-        
-    ax.bar([str(l) for l in lambdas], final_coops, color='#17becf', alpha=0.7)
-    ax.plot([str(l) for l in lambdas], final_coops, 'r-o', linewidth=2)
+    
+    # Use colormap for bars
+    cmap = plt.cm.get_cmap('viridis', len(lambdas))
+    colors_bar = [cmap(i) for i in range(len(lambdas))]
+    
+    ax.bar([str(l) for l in lambdas], final_coops, color=colors_bar, alpha=0.7, edgecolor='black')
+    ax.plot([str(l) for l in lambdas], final_coops, 'r-o', linewidth=2.5, markersize=8)
     
     ax.set_xlabel('DQN Mixing Coefficient ($\lambda$)')
     ax.set_ylabel('Final Cooperation Rate')
