@@ -76,7 +76,7 @@ def main():
     
     # Get parameter values for this chunk
     lambda_values = get_chunk_params(args.lambda_chunk, args.lambda_points, args.chunk_size, 0.0, 1.0)
-    r_values = get_chunk_params(args.r_chunk, args.r_points, args.chunk_size, 2.0, 5.0)
+    r_values = get_chunk_params(args.r_chunk, args.r_points, args.chunk_size, 1.0, 5.0)
     
     print(f"Phase Diagram Chunk: lambda_chunk={args.lambda_chunk}, r_chunk={args.r_chunk}")
     print(f"Lambda values: {lambda_values}")

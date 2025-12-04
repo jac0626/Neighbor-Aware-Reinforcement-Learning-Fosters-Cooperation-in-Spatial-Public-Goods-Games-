@@ -46,7 +46,7 @@ def create_phase_diagram(results, lambda_points, r_points):
     """Create 2D array from results."""
     # Define grid
     lambda_values = np.linspace(0.0, 1.0, lambda_points)
-    r_values = np.linspace(2.0, 5.0, r_points)
+    r_values = np.linspace(1.0, 5.0, r_points)
     
     # Initialize grid with NaN
     grid = np.full((r_points, lambda_points), np.nan)
