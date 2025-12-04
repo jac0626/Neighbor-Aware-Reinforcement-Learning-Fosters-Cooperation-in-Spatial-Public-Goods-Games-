@@ -151,7 +151,7 @@ def plot_cooperation_evolution(data, target_r, output_dir):
     # VERSION 3: Key lambda comparison (cleaner)
     fig, ax = plt.subplots(figsize=(8, 6))
     key_lambdas = [0.0, 0.5, 1.0]
-    colors_key = ['gray', '#ff7f0e', '#2ca02c']
+    colors_key = ['black', '#ff7f0e', '#2ca02c']  # OK: only 3 lambdas by design
     styles = ['--', '-', '-']
     
     for lam, color, style in zip(key_lambdas, colors_key, styles):
@@ -321,8 +321,6 @@ def plot_evolution_grid(data, output_dir):
     n_plots = len(selected_rs)
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     axes = axes.flatten()
-    
-    colors_dual = ['#1f77b4', '#ff7f0e', '#2ca02c']
     
     for idx, r_val in enumerate(selected_rs):
         ax = axes[idx]
