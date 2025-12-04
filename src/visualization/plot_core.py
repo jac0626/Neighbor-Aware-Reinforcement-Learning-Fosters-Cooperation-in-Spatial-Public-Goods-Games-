@@ -94,17 +94,17 @@ def plot_cooperation_evolution(data, target_r, output_dir):
     # Baseline (Lambda=0)
     if 0.0 in data[target_r]:
         runs = data[target_r][0.0]
-        # Average over runs if multiple (though matrix usually runs 1 per param set unless repeated)
-        # Assuming 1 run per param set for now, or we average if multiple
         avg_run = np.mean(runs, axis=0)
-        ax.plot(avg_run, label='Single-Brain (Baseline)', color='gray', linestyle='--', linewidth=2)
+        ax.plot(avg_run, label='Single-Brain (λ=0)', color='black', linestyle='--', linewidth=2.5, alpha=0.8)
         
-    # Dual-Brain (Lambda=0.1, 0.3, 0.5)
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
-    for i, lam in enumerate(sorted([k for k in data[target_r].keys() if k > 0])):
+    # Dual-Brain - use colormap for distinct colors
+    lambda_vals = sorted([k for k in data[target_r].keys() if k > 0])
+    cmap = plt.cm.get_cmap('viridis', len(lambda_vals))  # viridis colormap
+    
+    for i, lam in enumerate(lambda_vals):
         runs = data[target_r][lam]
         avg_run = np.mean(runs, axis=0)
-        ax.plot(avg_run, label=f'Dual-Brain ($\lambda={lam}$)', color=colors[i % len(colors)], linewidth=2)
+        ax.plot(avg_run, label=f'λ={lam}', color=cmap(i), linewidth=2)
         
     ax.set_xlabel('Iterations')
     ax.set_ylabel('Cooperation Rate')
@@ -122,16 +122,19 @@ def plot_cooperation_evolution(data, target_r, output_dir):
     # VERSION 2: Linear scale for long-term view
     fig, ax = plt.subplots(figsize=(8, 6))
     
+    # Linear scale version
     if 0.0 in data[target_r]:
         runs = data[target_r][0.0]
         avg_run = np.mean(runs, axis=0)
-        ax.plot(avg_run, label='Single-Brain (λ=0)', color='gray', linestyle='--', linewidth=2)
+        ax.plot(avg_run, label='Single-Brain (λ=0)', color='black', linestyle='--', linewidth=2.5, alpha=0.8)
     
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
-    for i, lam in enumerate(sorted([k for k in data[target_r].keys() if k > 0])):
+    lambda_vals = sorted([k for k in data[target_r].keys() if k > 0])
+    cmap = plt.cm.get_cmap('viridis', len(lambda_vals))
+    
+    for i, lam in enumerate(lambda_vals):
         runs = data[target_r][lam]
         avg_run = np.mean(runs, axis=0)
-        ax.plot(avg_run, label=f'Dual-Brain ($\\lambda={lam}$)', color=colors[i % len(colors)], linewidth=2)
+        ax.plot(avg_run, label=f'λ={lam}', color=cmap(i), linewidth=2)
     
     ax.set_xlabel('Iterations')
     ax.set_ylabel('Cooperation Rate')
@@ -316,14 +319,16 @@ def plot_evolution_grid(data, output_dir):
         if 0.0 in data[r_val]:
             runs = data[r_val][0.0]
             avg_run = np.mean(runs, axis=0)
-            ax.plot(avg_run, label='Single-Brain (λ=0)', color='gray', linestyle='--', linewidth=2.5, alpha=0.8)
+            ax.plot(avg_run, label='λ=0', color='black', linestyle='--', linewidth=2.5, alpha=0.8)
         
-        # Dual-Brain
+        # Dual-Brain with distinct colors
         dual_lambdas = sorted([k for k in data[r_val].keys() if k > 0])
+        cmap = plt.cm.get_cmap('viridis', len(dual_lambdas))
+        
         for i, lam in enumerate(dual_lambdas):
             runs = data[r_val][lam]
             avg_run = np.mean(runs, axis=0)
-            ax.plot(avg_run, label=f'λ={lam}', color=colors_dual[i % len(colors_dual)], linewidth=2)
+            ax.plot(avg_run, label=f'λ={lam}', color=cmap(i), linewidth=2)
         
         ax.set_xlabel('Iterations', fontsize=11)
         ax.set_ylabel('Cooperation Rate', fontsize=11)
