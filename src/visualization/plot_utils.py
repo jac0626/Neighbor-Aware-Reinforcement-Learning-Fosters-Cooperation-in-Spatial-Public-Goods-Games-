@@ -8,7 +8,7 @@ def setup_matplotlib_for_publication():
     """
     plt.style.use('default')
     mpl.rcParams['font.family'] = 'serif'
-    mpl.rcParams['font.serif'] = ['Times New Roman']
+    mpl.rcParams['font.serif'] = ['DejaVu Serif', 'Times New Roman', 'serif']
     mpl.rcParams['font.size'] = 12
     mpl.rcParams['axes.labelsize'] = 14
     mpl.rcParams['axes.titlesize'] = 16
