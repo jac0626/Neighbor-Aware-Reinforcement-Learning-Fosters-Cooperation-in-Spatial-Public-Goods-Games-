@@ -1,0 +1,108 @@
+name: Generate Phase Diagram
+
+on:
+  workflow_dispatch:
+    inputs:
+      lambda_points:
+        description: 'Number of lambda points'
+        required: true
+        default: '50'
+        type: string
+      r_points:
+        description: 'Number of r points'
+        required: true
+        default: '50'
+        type: string
+      iterations:
+        description: 'Iterations per experiment'
+        required: true
+        default: '100000'
+        type: string
+
+jobs:
+  # ============================================================================
+  # Phase Diagram Experiments - 9x9 = 81 parallel jobs
+  # Each job runs a 6x6 chunk of the parameter space
+  # ============================================================================
+  phase_experiment:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lambda_chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        r_chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+      fail-fast: false
+      max-parallel: 20
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run Phase Diagram Chunk
+      run: |
+        python experiments/run_phase_diagram.py \
+          --lambda_chunk ${{ matrix.lambda_chunk }} \
+          --r_chunk ${{ matrix.r_chunk }} \
+          --lambda_points ${{ github.event.inputs.lambda_points || 50 }} \
+          --r_points ${{ github.event.inputs.r_points || 50 }} \
+          --chunk_size 6 \
+          --iterations ${{ github.event.inputs.iterations || 100000 }} \
+          --L 100 \
+          --output_dir phase_results
+    
+    - name: Upload Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: phase-lam${{ matrix.lambda_chunk }}-r${{ matrix.r_chunk }}
+        path: phase_results/
+        retention-days: 7
+
+  # ============================================================================
+  # Aggregate and Plot Phase Diagram
+  # ============================================================================
+  generate_phase_diagram:
+    needs: phase_experiment
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Download all results
+      uses: actions/download-artifact@v4
+      with:
+        path: all_phase_results/
+        pattern: phase-*
+        merge-multiple: false
+    
+    - name: Generate Phase Diagram
+      run: |
+        python src/visualization/plot_phase_diagram.py \
+          --input all_phase_results/ \
+          --output paper_figures/ \
+          --lambda_points ${{ github.event.inputs.lambda_points || 50 }} \
+          --r_points ${{ github.event.inputs.r_points || 50 }}
+    
+    - name: Upload Final Figures
+      uses: actions/upload-artifact@v4
+      with:
+        name: phase_diagram_figures
+        path: paper_figures/
+        retention-days: 30
