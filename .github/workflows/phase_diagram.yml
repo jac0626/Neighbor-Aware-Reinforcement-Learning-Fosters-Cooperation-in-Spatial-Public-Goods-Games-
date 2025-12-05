@@ -21,15 +21,15 @@ on:
 
 jobs:
   # ============================================================================
-  # Phase Diagram Experiments - 9x9 = 81 parallel jobs
-  # Each job runs a 6x6 chunk of the parameter space
+  # Phase Diagram Experiments - 17x17 = 289 parallel jobs
+  # Each job runs a 3x3 chunk (9 experiments) of the parameter space
   # ============================================================================
   phase_experiment:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        lambda_chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        r_chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        lambda_chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        r_chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
       fail-fast: false
       max-parallel: 20
     
@@ -53,7 +53,7 @@ jobs:
           --r_chunk ${{ matrix.r_chunk }} \
           --lambda_points ${{ github.event.inputs.lambda_points || 50 }} \
           --r_points ${{ github.event.inputs.r_points || 50 }} \
-          --chunk_size 6 \
+          --chunk_size 3 \
           --iterations ${{ github.event.inputs.iterations || 100000 }} \
           --L 100 \
           --output_dir phase_results
