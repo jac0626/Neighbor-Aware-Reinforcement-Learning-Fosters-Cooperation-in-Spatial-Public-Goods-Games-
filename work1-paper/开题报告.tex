@@ -1,0 +1,287 @@
+\documentclass[UTF8,a4paper,12pt]{ctexart}
+
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{cite} % 引入引用宏包
+\usepackage{caption}
+
+% 页面设置
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+% 链接设置
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=blue,
+    citecolor=blue,
+}
+
+\begin{document}
+
+% --- 封面 ---
+\begin{center}
+    \Huge\textbf{云南大学}\\
+    \vspace{0.5cm}
+    \LARGE\textbf{研究生开题报告}
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+    \renewcommand{\arraystretch}{1.8}
+    \begin{tabular}{|p{3cm}|p{10cm}|}
+        \hline
+        \textbf{题\hspace{2em}目} & \textbf{基于双脑强化学习的公共物品博弈合作演化研究} \\
+        \hline
+        \textbf{研究类型} & 基础研究 \\
+        \hline
+        \textbf{学院/研究院} & 软件学院 \\
+        \hline
+        \textbf{学\hspace{2em}号} & 12024219002 \\
+        \hline
+        \textbf{姓\hspace{2em}名} & 蒋超 \\
+        \hline
+        \textbf{专\hspace{2em}业} & 电子信息 \\
+        \hline
+        \textbf{导\hspace{2em}师} & 康洪炜 \\
+        \hline
+        \textbf{层\hspace{2em}次} & 硕 士 \\
+        \hline
+        \textbf{学习形式} & 全日制 \\
+        \hline
+        \textbf{时\hspace{2em}间} & 2025年12月 \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\newpage
+\tableofcontents
+\newpage
+
+% --- 正文 ---
+
+\section{研究背景、目的和意义}
+
+\subsection{研究背景}
+博弈论是研究个体在决策过程中如何相互作用的学科，它关注个体如何在多方互动中寻求最优策略以最大化自身利益。在自然界和人类社会中，合作是一个核心概念，它是实现社会整体效益提升的关键因素\cite{perc2017}。然而，根据达尔文的自然选择理论\cite{darwin1859}，在缺乏适当机制支持的情况下，非合作个体（背叛者）往往因为短期利益获得更高的适应度，导致合作行为在长期的自然选择过程中逐渐消失，这就是著名的“公地悲剧”\cite{hardin1968}。
+
+为了解决这一困境，研究者们在空间公共物品博弈（SPGG）框架下提出了多种促进合作的机制。Nowak 总结了五条促进合作的规律，包括亲缘选择、直接互惠、间接互惠、网络互惠和群体选择\cite{nowak2006}。随后的研究进一步引入了奖惩机制\cite{sigmund2001}、声誉机制\cite{milinski2002}以及基于税收的制度性激励\cite{wang2021tax, li2022}。虽然这些机制在一定程度上解释了合作的涌现，但传统模型大多假设个体遵循固定的模仿规则（如费米规则），忽略了现实中个体通过试错（Trial-and-Error）进行主动学习的能力。
+
+随着人工智能的发展，强化学习（Reinforcement Learning, RL）被引入博弈论\cite{sutton2018}。然而，现有的多智能体强化学习（MARL）模型大多基于独立的 Q-learning，容易陷入局部最优，且难以模拟人类“直觉经验”与“社会规范”并存的复杂决策过程。认知心理学中的“双系统理论”指出，人类决策往往是直觉（系统1）与理性（系统2）的结合\cite{kahneman2011}。如何在博弈模型中构建这种“个体-社会”协同的双脑机制，是当前研究的一个重要空白。
+
+\subsection{研究目的}
+本研究旨在通过构建扩展的公共物品博弈模型，从“局部社会互动”和“全局智能进化”两个维度，系统探究合作行为的演化规律：
+\begin{enumerate}
+    \item \textbf{探究邻居感知机制（Neighbor Influence）：} 研究个体如何通过观察邻居的相对表现来调整自身的价值判断（Q值），从而在不改变外部收益结构的前提下促进合作簇的形成。
+    \item \textbf{构建双脑协同学习模型：} 提出一种混合双脑架构（Hybrid Dual-Brain Architecture），结合基于局部经验的 Q-table（个体脑）与基于全局智慧的 Shared DQN（社会脑），解决个体学习的短视问题。
+    \item \textbf{揭示合作涌现的微观机理：} 综合运用蒙特卡洛仿真和数学分析，揭示不同机制下合作簇的形成、维持及演变路径。
+\end{enumerate}
+
+\subsection{研究意义}
+\begin{itemize}
+    \item \textbf{理论意义：} 本研究创新性地将“邻居影响”与“双脑架构”引入 SPGG，完善了演化博弈中的微观学习机制，为理解“榜样效应”与“社会规范”如何影响合作提供了计算模型。
+    \item \textbf{现实意义：} 研究成果可指导多智能体系统（MAS）在分布式环境下的协作算法设计，特别是在需要平衡个体利益与集体目标的复杂系统中具有应用价值。
+\end{itemize}
+
+\section{国内外相关研究现状}
+
+\subsection{公共物品博弈与合作困境}
+公地悲剧是一种普遍存在的社会困境\cite{hardin1968}。为了研究这一现象，公共物品博弈（PGG）模型被广泛应用\cite{szabo2002vol}。Szabó 和 Hauert 等人研究了空间结构中的进化囚徒困境与公共物品博弈，发现空间聚类效应（网络互惠）能有效抵御背叛者的入侵\cite{szabo2002evo}。此外，Hauert 等人提出的志愿参与机制（Volunteering）也被证明是促进合作的有效手段\cite{hauert2002}。
+
+\subsection{激励机制的研究进展}
+为了进一步促进合作，学界引入了多种外部激励机制。Sasaki 等人研究了基于奖励基金的复制动力学\cite{sasaki2011}。Nakamaru 和 Iwasa 探讨了利他惩罚与自私惩罚的共同进化\cite{nakamaru2006}。近年来，税收机制作为一种宏观调控手段受到关注。Wang 等人提出了基于税收的纯惩罚与纯奖励模型\cite{wang2021tax}，Li 等人进一步分析了税收惩罚下的复制动力学特性\cite{li2022}。此外，Pei 等人研究了收入再分配对合作演化的影响\cite{pei2017}。然而，这些研究大多基于传统的演化规则，较少涉及智能体的自主学习。
+
+\subsection{强化学习在博弈中的应用}
+传统的演化博弈多采用费米更新规则模拟生物进化\cite{szabo1998}。近年来，强化学习（RL）逐渐被用于模拟具有高认知能力的个体\cite{sutton2018}。Mnih 等人提出的深度 Q 网络（DQN）使得处理高维状态空间成为可能\cite{mnih2015}。在社会困境中，Leibo 等人利用多智能体强化学习研究了序列社会困境中的合作涌现\cite{leibo2017}。然而，目前的 RL 博弈模型多局限于个体的独立学习，忽略了社会规范和集体智慧对个体决策的宏观指导作用，缺乏对“个体-社会”双层认知架构的建模\cite{zhang2021}。
+\section{研究的主要内容}
+
+本研究内容分为两个主要部分，分别对应硕士学位论文的第三章和第四章。
+
+\subsection{第一部分：基于邻居影响（Neighbor Influence）的合作演化机制}
+本部分重点探究局部范围内的社会比较如何促进合作。
+\begin{itemize}
+    \item \textbf{模型构建：} 在 SPGG 框架下，引入基于声誉的状态空间。个体不仅关注自身收益，还通过“邻居影响（NI）”机制观察邻域内表现最好的邻居。
+    \item \textbf{核心机制：} 定义“归一化相对表现差异”。如果邻居的综合奖励显著高于自身，个体将计算一个调整量 $\lambda_{NI}$，对与该邻居一致的行为进行正向激励（增加 Q 值）。这一机制模拟了人类“见贤思齐”的学习心理。
+    \item \textbf{影响因素分析：} 系统分析感知范围（一阶 vs 二阶邻居）\cite{xia2012} 以及 NI 强度系数 $\kappa$ 对合作涌现临界点的影响。
+\end{itemize}
+
+\subsection{第二部分：基于混合双脑架构的合作演化研究}
+本部分旨在突破传统个体学习的局限，构建“个体脑+社会脑”的双层决策模型。
+\begin{itemize}
+    \item \textbf{个体脑（Individual Brain）：} 维持传统的 Q-table，基于离散的局部状态（如邻域声誉好坏），记录个体的私有经验，代表“直觉”或“习惯”。
+    \item \textbf{社会脑（Social Brain）：} 引入一个全局共享的深度 Q 网络（Shared DQN）。该网络从全网所有个体的经验回放池（Replay Buffer）中学习，输入连续特征向量，代表“社会规范”或“集体智慧”。
+    \item \textbf{混合决策机制：} 个体的最终决策由个体脑和社会脑共同决定，通过权重参数 $\lambda$ 调节对社会规范的依赖程度。
+\end{itemize}
+
+\section{研究方法与方案}
+
+\subsection{数学模型设计}
+
+\subsubsection{基础 SPGG 与收益模型}
+在 $L \times L$ 的方格网络中，个体 $i$ 的收益 $P_i(t)$ 定义为：
+\begin{equation}
+P_i(t) = \sum_{g \in G_i} \left( \frac{r \cdot n_C(g, t)}{k} - c \cdot (1 - a_i(t))\right)
+\end{equation}
+引入声誉机制，综合奖励 $R_i(t)$ 由归一化后的收益 $P'_i(t)$ 和声誉变化 $\Delta U'_i(t)$ 加权得出。
+
+\subsubsection{第一部分：邻居影响（NI）更新规则}
+在 Q-learning 的基础上，引入邻居影响项。计算邻居 $j$ 相对于 $i$ 的归一化奖励差 $\Delta R_{ij}(t)$，并找出最大正向差异 $\Delta R_{md}(t)$。NI 强度 $\lambda_{NI}(t)$ 定义为：
+\begin{equation}
+\lambda_{NI}(t) = \kappa \cdot \frac{\Delta R_{md}(t)}{\Delta R_{gl}(t) + \lambda_{\epsilon}}
+\end{equation}
+其中 $\Delta R_{gl}(t)$ 为全局最大差异归一化因子。更新公式为：
+\begin{equation}
+Q(s, a) \leftarrow Q(s, a) + \lambda_{NI}(t) \cdot \text{sign}(a_{best} == a_i)
+\end{equation}
+
+\subsubsection{第二部分：混合双脑（Dual-Brain）模型}
+该模型由两个平行的决策系统组成，分别代表个体的“经验直觉”与“社会规范”：
+
+\paragraph{1. 个体脑 (Individual Brain / Q-table)}
+\begin{itemize}
+    \item \textbf{功能定义：} 基于局部离散状态记录个体的直接经验，模拟习惯性决策。
+    \item \textbf{状态空间：} $s_{discrete} \in \{0, 1\}$，基于邻域平均声誉划分。
+    \item \textbf{更新规则：} 采用标准 Q-learning 的时序差分（TD）更新：
+    \begin{equation}
+    Q_{ind}(s, a) \leftarrow (1 - \alpha) Q_{ind}(s, a) + \alpha \left[ R + \gamma \max_{a'} Q_{ind}(s', a') \right]
+    \end{equation}
+\end{itemize}
+
+\paragraph{2. 社会脑 (Social Brain / Shared DQN)}
+\begin{itemize}
+    \item \textbf{功能定义：} 基于全局经验回放池学习通用的最优策略，模拟社会规范或集体智慧。
+    \item \textbf{网络结构：} 基于 PyTorch 实现的 SharedDQN。
+    \begin{itemize}
+        \item \textbf{输入层：} 连续状态向量 $S_{cont}$，维度 $dim=4$。特征包括：自身的归一化声誉、邻居平均声誉、邻居合作率、自身归一化收益。
+        \item \textbf{隐藏层：} 全连接层（FC），维度 64，激活函数 ReLU。
+        \item \textbf{输出层：} 线性层，输出维度 2（对应合作与背叛的 Q 值）。
+    \end{itemize}
+    \item \textbf{损失函数：} 采用均方误差损失（MSE Loss）：
+    \begin{equation}
+    L(\theta) = \mathbb{E}_{(s,a,r,s') \sim \mathcal{D}} \left[ \left( r + \gamma \max_{a'} Q_{soc}(s', a'; \theta^-) - Q_{soc}(s, a; \theta) \right)^2 \right]
+    \end{equation}
+    其中 $Q_{soc}$ 为社会脑输出的动作价值，$\mathcal{D}$ 为全局经验回放池。
+\end{itemize}
+
+\paragraph{3. 混合决策公式}
+为了实现个体经验与社会智慧的协同，定义混合权重参数 $\lambda_{soc}$。个体的最终动作价值 $Q_{final}$ 计算如下：
+\begin{equation}
+Q_{final}(s, a) = (1 - \lambda_{soc}) \cdot Q_{ind}(s_{discrete}, a) + \lambda_{soc} \cdot Q_{soc}(s_{continuous}, a)
+\end{equation}
+其中：
+\begin{itemize}
+    \item $\lambda_{soc} \in [0, 1]$：表示个体对社会规范（集体智慧）的依赖程度。
+    \item 当 $\lambda_{soc} \to 0$ 时，个体主要依赖自身经验（类似于标准 Q-learning）。
+    \item 当 $\lambda_{soc} \to 1$ 时，个体完全遵从社会脑的建议（类似于从众或规范遵循）。
+\end{itemize}
+
+\subsection{仿真实验设计}
+\begin{itemize}
+    \item \textbf{环境参数：} 网格大小 $L \times L = 100 \times 100$，协同因子 $r \in [2.0, 5.0]$。
+    \item \textbf{算法参数：} 
+    \begin{itemize}
+        \item 个体脑学习率 $\alpha=0.1$，社会脑（DQN）学习率 $\alpha_{dqn}=1e-3$。
+        \item 折扣因子 $\gamma=0.9$，目标网络更新频率 $C=100$。
+        \item 关键参数 $\lambda_{soc}$ 将作为核心变量进行敏感性分析，以探究“社会依赖度”对合作涌现的影响。
+    \end{itemize}
+    \item \textbf{实验流程：} 初始化群体 $\rightarrow$ 循环迭代（计算混合 Q 值 $\rightarrow$ 动作选择 $\rightarrow$ 博弈交互 $\rightarrow$ 分别更新 $Q_{ind}$ 和 $Q_{soc}$） $\rightarrow$ 统计合作率与收益。
+\end{itemize}
+\section{创新点及预期成果}
+
+\subsection{创新点}
+\begin{enumerate}
+    \item \textbf{机制创新：} 首次在 SPGG 中提出基于“相对表现差异”驱动的 Q 值修正（NI）机制，模拟了人类“见贤思齐”的社会心理，弥补了标准 RL 在利用局部社会信息方面的不足。
+    \item \textbf{架构创新：} 提出“个体直觉（Q-table）+ 社会规范（Shared DQN）”的双脑架构。该架构突破了传统 MARL 方法中“完全独立”或“完全中心化”的二元对立，提供了一种新的演化博弈学习范式。
+    \item \textbf{状态表示创新：} 构建了包含声誉分布与收益的连续状态空间，解决了传统离散状态丢失关键环境信息的问题。
+\end{enumerate}
+
+\subsection{预期成果}
+\begin{itemize}
+    \item \textbf{学术论文：} 发表 1 篇 SCI 论文（关于 Neighbor-Aware RL）；撰写 1 篇关于 Hybrid Dual-Brain Architecture 的高水平论文。
+    \item \textbf{学位论文：} 完成高质量的硕士学位论文，系统阐述个体学习与社会学习在合作演化中的作用。
+\end{itemize}
+
+\section{前期已完成工作与困难}
+
+\subsection{已完成工作}
+
+\subsubsection{第一部分：邻居感知机制的研究（已发表）}
+本研究的第一阶段工作——关于邻居影响（Neighbor Influence, NI）机制在空间公共物品博弈中的作用，已完成模型构建、仿真分析及论文撰写，并成功发表于 SCI 期刊。
+\begin{itemize}
+    \item \textbf{主要结论：} 证实了基于“相对表现差异”的 Q 值修正机制能有效促进合作簇的自发形成，即使在低协同因子条件下也能维持高水平合作。
+    \item \textbf{发表成果：} 
+    \begin{quote}
+        \textbf{Hongwei Kang, Chao Jiang*, et al.} Neighbor-Aware Reinforcement Learning Fosters Cooperation in Spatial Public Goods Games. \textit{Chaos, Solitons \& Fractals} (JCR Q1, IF=5.3), 2025, 199: 116862.
+    \end{quote}
+\end{itemize}
+
+\subsubsection{第二部分：双脑模型的可行性探索}
+针对大论文第四章的“双脑架构”，已完成代码框架搭建（基于 PyTorch 的 Shared DQN），并进行了初步的训练测试。
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\linewidth]{4_evolution_grid.png}
+    \caption{初步实验}
+    \label{fig:placeholder}
+\end{figure}
+\subsection{遇到的困难}
+\begin{enumerate}
+    \item \textbf{DQN 训练的非平稳性：} 多智能体并发学习导致环境分布漂移，Loss 波动大，需精细调节 Target Network 更新频率。
+    \item \textbf{参数敏感性：} 双脑权重 $\lambda$ 对系统收敛影响显著，需进行大量实验寻找最优区间。
+\end{enumerate}
+
+\section{工作进度安排}
+\begin{itemize}
+    \item \textbf{2024.12 — 2025.02：} 完善第一部分实验数据，完成小论文投稿；细化双脑模型实验方案。
+    \item \textbf{2025.03 — 2025.05：} 进行大规模仿真，重点分析 $\lambda$ 对合作收敛的影响，对比基准模型。
+    \item \textbf{2025.06 — 2025.08：} 中期检查；总结双脑模型成果，撰写大论文核心章节。
+    \item \textbf{2025.09 — 2025.12：} 大论文统稿，查重、盲审与答辩准备。
+\end{itemize}
+
+\begin{thebibliography}{99}
+    % [1-23] 来自您原有的参考文献列表
+    \bibitem{perc2017} Perc M, Jordan J J, Rand D G, et al. Statistical physics of human cooperation[J]. Physics Reports, 2017, 687: 1-51.
+    \bibitem{perc2016} Perc M. Phase transitions in models of human cooperation[J]. Physics Letters A, 2016, 380(36): 2803-2808.
+    \bibitem{dawes1988} Dawes R M, Thaler R H. Anomalies: cooperation[J]. Journal of economic perspectives, 1988, 2(3): 187-197.
+    \bibitem{fehr2003} Fehr E, Fischbacher U. The nature of human altruism[J]. Nature, 2003, 425(6960): 785-791.
+    \bibitem{colman2013} Colman A M. Game theory and its applications: In the social and biological sciences[M]. Psychology Press, 2013.
+    \bibitem{smith1982} Smith J M. Evolution and the Theory of Games[M]. Cambridge university press, 1982.
+    \bibitem{darwin1859} Darwin C. On the Origin of Species[M]. London: John Murray, 1859.
+    \bibitem{szabo2002vol} Szabó G, Hauert C. Phase transitions and volunteering in spatial public goods games[J]. Physical review letters, 2002, 89(11): 118101.
+    \bibitem{xia2012} Xia C Y, Meloni S, Moreno Y. Effects of environment knowledge on agglomeration and cooperation in spatial public goods games[J]. Advances in Complex Systems, 2012, 15(supp01): 1250056.
+    \bibitem{szabo2002evo} Szabó G, Hauert C. Evolutionary prisoner’s dilemma games with voluntary participation[J]. Physical Review E, 2002, 66(6): 062903.
+    \bibitem{hauert2002} Hauert C, De Monte S, Hofbauer J, et al. Volunteering as red queen mechanism for cooperation in public goods games[J]. Science, 2002, 296(5570): 1129-1132.
+    \bibitem{nowak2006} Nowak M A. Five rules for the evolution of cooperation[J]. Science, 2006, 314(5805): 1560-1563.
+    \bibitem{sasaki2011} Sasaki T, Unemi T. Replicator dynamics in public goods games with reward funds[J]. Journal of Theoretical Biology, 2011, 287: 109-114.
+    \bibitem{nakamaru2006} Nakamaru M, Iwasa Y. The coevolution of altruism and punishment: role of the selfish punisher[J]. Journal of theoretical biology, 2006, 240(3): 475-488.
+    \bibitem{sigmund2001} Sigmund K, Hauert C, Nowak M A. Reward and punishment[J]. Proceedings of the National Academy of Sciences, 2001, 98(19): 10757-10762.
+    \bibitem{szolnoki2015} Szolnoki A, Perc M. Reentrant phase transitions and defensive alliances in social dilemmas with informed strategies[J]. Europhysics Letters, 2015, 110(3): 38003.
+    \bibitem{liu2020} Liu L, Chen X. Evolutionary game dynamics in multiagent systems with prosocial and antisocial exclusion strategies[J]. Knowledge-Based Systems, 2020, 188: 104835.
+    \bibitem{griffin2017} Griffin C, Belmonte A. Cyclic public goods games: Compensated coexistence among mutual cheaters stabilized by optimized penalty taxation[J]. Physical Review E, 2017, 95(5): 052309.
+    \bibitem{pei2017} Pei Z, Wang B, Du J. Effects of income redistribution on the evolution of cooperation in spatial public goods games[J]. New Journal of Physics, 2017, 19(1): 013037.
+    \bibitem{wang2022} Wang S, Chen X, Xiao Z, et al. Decentralized incentives for general well-being in networked public goods game[J]. Applied Mathematics and Computation, 2022, 431: 127308.
+    \bibitem{sun2021} Sun W, Liu L, Chen X, et al. Combination of institutional incentives for cooperative governance of risky commons[J]. Iscience, 2021, 24(8).
+    \bibitem{wang2021tax} Wang S, Liu L, Chen X. Tax-based pure punishment and reward in the public goods game[J]. Physics Letters A, 2021, 386: 126965.
+    \bibitem{li2022} Li M Y, Kang H W, Sun X P, et al. Replicator dynamics of public goods game with tax-based punishment[J]. Chaos, Solitons \& Fractals, 2022, 164: 112747.
+    
+    % [24-28] 补充的强化学习与双脑模型核心文献
+    \bibitem{sutton2018} Sutton R S, Barto A G. Reinforcement learning: An introduction[M]. MIT press, 2018.
+    \bibitem{mnih2015} Mnih V, Kavukcuoglu K, Silver D, et al. Human-level control through deep reinforcement learning[J]. Nature, 2015, 518(7540): 529-533.
+    \bibitem{leibo2017} Leibo J Z, Zambaldi V, Lanctot M, et al. Multi-agent reinforcement learning in sequential social dilemmas[C]//Proceedings of the 16th Conference on Autonomous Agents and MultiAgent Systems. 2017: 464-473.
+    \bibitem{kahneman2011} Kahneman D. Thinking, fast and slow[M]. Macmillan, 2011.
+    \bibitem{zhang2021} Zhang K, Yang Z, Başar T. Multi-agent reinforcement learning: A selective overview of theories and algorithms[J]. Handbook of reinforcement learning and control, 2021: 321-384.
+    
+    % 其他引用
+    \bibitem{hardin1968} Hardin G. The tragedy of the commons[J]. Science, 1968, 162(3859): 1243-1248.
+    \bibitem{milinski2002} Milinski M, Semmann D, Krambeck H J. Reputation helps solve the 'tragedy of the commons'[J]. Nature, 2002, 415(6870): 424-426.
+    \bibitem{szabo1998} Szabó G, Tőke C. Evolutionary prisoner's dilemma game on a square lattice[J]. Physical Review E, 1998, 58(1): 69.
+
+\end{thebibliography}
+
+\end{document}

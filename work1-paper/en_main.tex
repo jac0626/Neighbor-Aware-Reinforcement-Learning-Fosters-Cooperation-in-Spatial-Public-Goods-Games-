@@ -1,0 +1,493 @@
+\documentclass[preprint,number,sort&compress,12pt]{elsarticle}
+
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{xcolor}
+
+
+% --- REMOVING REVISION MARKS ---
+\newcommand{\add}[1]{#1} % This makes the \add command do nothing.
+
+
+\usepackage{hyperref}
+\hypersetup{
+    hidelinks,
+    pdfauthor={Hongwei Kang et al.}
+}
+
+\usepackage{caption}
+\captionsetup[figure]{labelfont={bf},name={Fig.},labelsep=period}
+
+
+\renewcommand{\eqref}[1]{Eq.~(\ref{#1})}
+
+
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+\algnewcommand\algorithmicoutput{\textbf{Output:}}
+\algnewcommand\Output{\item[\algorithmicoutput]}
+\algnewcommand\algorithmicinit{\textbf{Initialization:}}
+\algnewcommand\Init{\item[\algorithmicinit]}
+
+\journal{Chaos, Solitons and Fractals}
+
+\begin{document}
+
+\begin{frontmatter}
+
+
+\title{Neighbor-Aware Reinforcement Learning Fosters Cooperation in Spatial Public Goods Games}
+
+
+\author{Hongwei Kang\corref{cor1}\fnref{fn1}}
+\ead{hwkang@ynu.edu.cn}
+
+\author{Chao Jiang\fnref{fn1}}
+\author{Yong Shen}
+\author{Xingping Sun}
+\author{Qingyi Chen}
+
+\cortext[cor1]{Corresponding author}
+\fntext[fn1]{These authors contributed equally to this work.}
+
+
+\address{School of Software, Yunnan University, Kunming, 650000, Yunnan, China}
+
+
+\begin{abstract}
+The emergence and self-organization of cooperation within social dilemmas remain a central challenge in the study of evolutionary public goods games. Traditional models often rely on fixed behavioral update rules, inadequately capturing the learning capabilities of real-world individuals. To address this, we develop and investigate a novel model of cooperative evolution that integrates individual reinforcement learning (RL) with a mechanism termed ``Neighbor Influence'' (NI). In this framework, agents are not passive rule-followers; they employ Q-learning to dynamically decide between cooperation and defection. Importantly, their decisions are shaped by both individual trial-and-error and the influence of their neighbors. This study systematically analyzes the role of the NI mechanism and explores how reputation systems and agents' perceptual ranges (direct versus indirect neighbors) modulate cooperative evolution. Extensive simulations reveal that NI is crucial for promoting the spontaneous formation of cooperative clusters, thereby mitigating the ``Tragedy of the Commons''. This mechanism substantially boosts cooperation levels, even under conditions where conventional RL models falter. Our research further elucidates how the strength of neighbor influence, individual preferences for reputation versus direct payoffs, and perceptual range critically shape the dynamics and eventual stability of cooperative behavior. By focusing on adaptive learning and local social interactions, this work offers a computational model that clarifies the mechanisms underpinning macroscopic cooperation in complex systems and provides valuable theoretical insights for designing strategies to foster collective collaboration.
+\end{abstract}
+
+
+\begin{keyword}
+Reinforcement learning \sep Spatial public goods game \sep Neighbor influence \sep Reputation mechanism \sep Perceptual range
+\end{keyword}
+
+\end{frontmatter}
+
+
+\section{Introduction}
+\label{sec:introduction}
+
+The self-organization of cooperation in social dilemmas has long been a key topic in research on evolutionary public goods games \cite{1, 2, 3, 4, 5, 6, 7}. The ``Tragedy of the Commons'' \cite{8} starkly illustrates how, without effective coordination, individual pursuit of short-term gains can erode collective interests. Evolutionary Game Theory (EGT) offers a powerful analytical framework for such dilemmas, especially on complex networks whose resilience is a topic of broad interest \cite{9, 10, 11, 12, 13, 64}. Within EGT, the Spatial Public Goods Game (SPGG) is a prominent model for its utility in simulating collective cooperation and the ``free-rider'' problem \cite{14, 15, 16, 17, 18, 19}.
+
+To foster cooperation, researchers have explored numerous mechanisms. For instance, spatial structures, a form of network reciprocity, can enable cooperators to form ``strongholds'' against defection \cite{20, 21}. Punishing defection \cite{22, 23, 24, 25, 26, 27, 28, 29} or rewarding cooperation \cite{30, 31, 32} can alter payoff structures to guide behavior. Reputation, a cornerstone of indirect reciprocity, influences future interactions by tracking past behaviors \cite{33, 34, 35, 36, 37, 38, 39, 40, 58, 62, 63}. Factors like intra-group heterogeneity and institutional incentives also exert a significant impact \cite{40, 41, 42, 61, 63}. While these mechanisms enrich our understanding, much research assumes agents are passive rule-followers \cite{43, 44}, often overlooking individuals' capacity for dynamic learning and adaptation. This contrasts with real-world scenarios where individuals adjust strategies through continuous trial and error, a process involving crucial feedback loops \cite{45, 46, 57}. More recently, Reinforcement Learning (RL) \cite{47} has been applied to social dilemmas \cite{48, 49, 50, 51, 52, 53, 54, 55, 59, 60}. In RL, agents actively learn and optimize strategies through environmental interaction, better reflecting biological and human learning. However, many RL models in spatial games do not appear to fully leverage local social information, such as neighbors' choices or performance. Although some studies explore social learning within RL frameworks \cite{55, 56, 58}, how to effectively integrate information like neighbors' relative success into an individual's value judgment, and how this interacts with reputation dynamics and perceptual range, warrants deeper investigation. We posited that a Q-value adjustment mechanism guiding agents to learn from successful neighbors might more effectively harness the network reciprocity potential of spatial structures within an RL context.
+
+Motivated by these considerations, we developed and evaluated a model of cooperative evolution combining individual Q-learning with a Q-value adjustment based on neighbors' relative performance (Neighbor Influence, NI) in an SPGG. When agents update Q-values, they consider not only their own rewards but also, through NI, observe top-performing neighbors and adjust the Q-value of their recent action based on these neighbors' relative rewards. This adjustment aims to guide agents towards behaviors proven effective in their local micro-environment. Focusing on this NI mechanism, we systematically investigate its influence on cooperation and examine the regulatory roles of reputation dynamics and agents' perceptual range.
+
+Our simulations provide clear evidence that NI plays a critical role in fostering cooperator clustering and mitigating the ``Tragedy of the Commons.'' It markedly improves cooperation levels, even in parameter regimes where standard Q-learning struggles. We also demonstrate how neighbor influence strength, the weighting of reputation versus direct payoffs, and perceptual range critically influence cooperative dynamics. An important finding is the synergistic benefit of NI and reputation mechanisms, with NI’s effectiveness amplified when agents perceive a wider neighborhood. This study, by integrating adaptive learning with local social interactions, offers a computational model that elucidates macroscopic cooperation in complex systems and provides valuable theoretical grounding and practical insights for promoting collective collaboration.
+
+\section{Model}
+\label{sec:model}
+
+We now detail the SPGG model developed. The model integrates individual learning and inter-neighbor influence, also considering reputation dynamics and agents' perceptual range. Agents make decisions on a spatial grid, allowing observation of the system's evolutionary trajectory.
+
+\subsection{Basic Setup of the Spatial Public Goods Game}
+
+The model operates on an $L \times L$ square lattice with $N_{tot} = L^2$ agents ($L = 100$ in this study), using periodic boundary conditions to mitigate edge effects. Each node $i$ represents an agent. Time $t$ evolves in discrete steps. At each step, agent $i$ chooses an action $a_i(t) \in \{C, D\}$ (Cooperation/Defection, coded 0/1). Agents interact with direct neighbors (Von Neumann neighborhood). Agent $i$ participates in $k$ PGG groups: those centered on itself and its neighbors. In a PGG group $g \in G_i$ (the set of groups agent $i$ belongs to) with $k$ members, cooperators contribute a cost $c$, defectors 0. The group's total contribution is multiplied by a synergy factor $r$, and the resulting public good is divided equally among all $k$ members. If $n_C(g, t)$ is the number of cooperators in group $g$ at time $t$, agent $i$'s total payoff $P_i(t)$ is:
+\begin{equation}
+P_i(t) = \sum_{g \in G_i} \left( \frac{r \cdot n_C(g, t)}{k} - c \cdot (1 - a_i(t))\right)
+\label{eq:payoff_model_original_restored}
+\end{equation}
+
+\subsection{Reputation Mechanism}
+
+To explore indirect reciprocity, the model includes a reputation mechanism. Each agent $i$ has a reputation $U_i(t)$, reflecting recent behavior, initialized to $U_i(0) = 0$ and bounded within $[-U_{max}, U_{max}]$ ($U_{max} = 10$). At each step $t$, $U_i(t)$ updates based on $a_i(t)$: $U_i(t+1) = U_i(t) + \delta_C$ for cooperation, $U_i(t+1) = U_i(t) - \delta_D$ for defection ($\delta_C = 1, \delta_D = 1$). The instantaneous reputation change $\Delta U_i(t)$ is:
+\begin{equation}
+\Delta U_i(t) =
+\begin{cases}
++\delta_C = +1, & \text{if } a_i(t) = 0 \\
+-\delta_D = -1, & \text{if } a_i(t) = 1
+\end{cases}
+\label{eq:rep_change_model_restored}
+\end{equation}
+Updated values are clipped: $U_i(t+1) = \max(-U_{max}, \min(U_{max}, U_i(t+1)))$.
+
+\subsection{Reinforcement Learning: Q-Learning}
+
+Agents use Q-learning to optimize strategies for maximal long-term cumulative rewards. Agent $i$ maintains a Q-table $Q_i(s, a)$ for the expected value of action $a$ in state $s$. The state $s_i(t)$ perceived by agent $i$ depends on the average reputation within its perceptual range $\Omega_i$ (controlled by parameter $M$). If $M=1$, $\Omega_i$ includes self and 4 first-order neighbors ($N_{per} = 5$); if $M=2$, $\Omega_i$ includes self, 4 first-order, and 8 second-order neighbors ($N_{per} = 13$). The average reputation is:
+\begin{equation}
+\bar{U}_i(t) = \frac{1}{|\Omega_i|} \sum_{j \in \Omega_i} U_j(t)
+\label{eq:rep_avg_model_restored}
+\end{equation}
+For state space simplification, $\bar{U}_i(t)$ maps to a binary state $s_i(t)$:
+\begin{equation}
+s_i(t) =
+\begin{cases}
+1 & (\text{``High Reputation'' state}), \quad \text{if } \bar{U}_i(t) > 0 \\
+0 & (\text{``Low/Medium Reputation'' state}), \quad \text{if } \bar{U}_i(t) \le 0
+\end{cases}
+\label{eq:rep_state_model_restored}
+\end{equation}
+Thus, the Q-table is $2 \times 2$.
+
+After action $a_i(t)$, agent $i$ receives a composite reward $R_i(t)$, a weighted sum of its immediate payoff $P_i(t)$ and reputation change $\Delta U_i(t)$. Both are Min-Max normalized using \textbf{theoretical} bounds for comparability and stability. Theoretical payoff bounds ($c=1$) are $P_{Tmax} = 4r$ and $P_{Tmin} = r - 5$. Normalized payoff $P'_i(t)$ is:
+\begin{equation}
+P'_i(t) = \frac{P_i(t) - P_{Tmin}}{P_{Tmax} - P_{Tmin}} = \frac{P_i(t) - r + 5}{3r + 5}
+\label{eq:payoff_norm_theory_original_restored}
+\end{equation}
+Theoretical reputation change bounds are $\Delta U_{Tmin} = -1, \Delta U_{Tmax} = +1$. Normalized reputation change $\Delta U'_i(t)$ is:
+\begin{equation}
+\Delta U'_i(t) = \frac{\Delta U_i(t) - \Delta U_{Tmin}}{\Delta U_{Tmax} - \Delta U_{Tmin}} = \frac{\Delta U_i(t) + 1}{2}
+\label{eq:rep_change_norm_theory_model_restored}
+\end{equation}
+(Cooperation yields $\Delta U'_i(t)=1.0$; defection yields $\Delta U'_i(t)=0$). The composite reward $R_i(t)$ is:
+\begin{equation}
+R_i(t) = w_P \cdot P'_i(t) + w_R \cdot \Delta U'_i(t)
+\label{eq:reward_model_normalized_theory_restored}
+\end{equation}
+where $w_P \in [0, 1]$ is the payoff weight, and $w_R = 1 - w_P$.
+
+The Q-table updates via the standard rule:
+\begin{equation}
+Q_i(s_i(t), a_i(t)) \leftarrow (1 - \eta) Q_i(s_i(t), a_i(t)) + \eta \left[ R_i(t) + \gamma \max_{a'} Q_i(s_i(t+1), a') \right]
+\label{eq:q_update_model_restored}
+\end{equation}
+with learning rate $\eta=0.8$ and discount factor $\gamma=0.9$.
+
+An $\epsilon$-greedy policy balances exploration/exploitation. With probability $1 - \epsilon(t)$, agent $i$ chooses $a_i(t) = \arg \max_{a} Q_i(s_i(t), a)$ (ties broken randomly). With probability $\epsilon(t)$, it explores randomly. $\epsilon(t)$ decays: $\epsilon(t+1) = \max(\epsilon_{min}, \epsilon(t) \cdot \epsilon_{dcy})$, with $\epsilon_0 = 0.5, \epsilon_{min} = 0.01, \epsilon_{dcy} = 0.99$.
+
+\subsection{Neighbor Influence (NI) Mechanism}
+
+The NI mechanism, central to our model, integrates information about neighbors' relative performance into Q-learning, applied \textbf{after} the standard Q-update. For each neighbor $j \in \Omega'_i = \Omega_i \setminus \{i\}$, the difference in \textbf{normalized comprehensive reward} is $\Delta R_{ij}(t) = R_j(t) - R_i(t)$. The maximum positive reward difference between $i$ and its best-performing neighbor is:
+\begin{equation}
+\Delta R_{md}(t) = \max \left( 0, \max_{j \in \Omega'_i} \{ \Delta R_{ij}(t) \} \right)
+\label{eq:max_diff_model_restored}
+\end{equation}
+Let $j^* = \arg \max_{j \in \Omega'_i} \{ R_j(t) \}$ (if $\Delta R_{md}(t) > 0$). For comparability and to avoid extreme NI strength, we calculate the global maximum absolute \textbf{normalized} reward difference between agents and their perceived neighbors, plus a regularization term $\lambda_{\epsilon}=0.01$:
+\begin{equation}
+\Delta R_{gl}(t) = \left( \max_{k \in N_{tot}} \left[ \max_{l \in \Omega'_k} |R_l(t) - R_k(t)| \right] \right) + \lambda_{\epsilon}
+\label{eq:global_diff_model_restored}
+\end{equation}
+The NI strength $\lambda_{NI}(t)$ depends on the individual's relative gap with its best neighbor and a global control parameter $\kappa \ge 0$:
+\begin{equation}
+\lambda_{NI}(t) = \kappa \cdot \frac{\Delta R_{md}(t)}{\Delta R_{gl}(t)}
+\label{eq:nei_weight_model_restored}
+\end{equation}
+Behavioral consistency with $j^*$ (if $\Delta R_{md}(t) > 0$) is:
+\begin{equation}
+\Delta_{bh}(t) =
+\begin{cases}
++1, & \text{if } a_i(t) = a_{j^*}(t) \\
+-1, & \text{if } a_i(t) \neq a_{j^*}(t)
+\end{cases}
+\label{eq:behavior_model_restored}
+\end{equation}
+Finally, NI adjusts the Q-value of $a_i(t)$ in state $s_i(t)$:
+\begin{equation}
+\text{If } \Delta R_{md}(t) > 0: \quad Q_i(s_i(t), a_i(t)) \leftarrow Q_i(s_i(t), a_i(t)) + \lambda_{NI}(t) \cdot \Delta_{bh}(t)
+\label{eq:neighbor_update_model_restored}
+\end{equation}
+This adjustment positively reinforces behavior matching a better-performing neighbor and penalizes differing behavior. The NI contribution is assessed by comparing its adjustment $\Delta Q_{NI(t)}$ with the standard Q-learning update $\Delta Q_{Q(t)}$:
+\begin{equation}
+\text{NI}(t) = \frac{|\Delta Q_{NI(t)}|}{|\Delta Q_{Q(t)}| + |\Delta Q_{NI(t)}| + \lambda_{\epsilon}'} \times 100\%
+\label{eq:neighbor_influence_percentage_restored}
+\end{equation}
+(with small $\lambda_{\epsilon}' \approx 10^{-9}$).
+
+\subsection{Algorithmic Overview}
+The simulation procedure is outlined in Algorithm \ref{alg:spgg_model_restored}.
+
+\begin{algorithm}
+\caption{SPGG Evolutionary Algorithm with Reinforcement Learning and Neighbor Influence}
+\label{alg:spgg_model_restored}
+\begin{algorithmic}
+\Statex \textbf{Init}
+\State Set parameters: $L, M, r, c=1, U_{max}, \delta_C, \delta_D, \eta, \gamma, \epsilon_0, \epsilon_{min}, \epsilon_{dcy}, w_P, \kappa, \lambda_{\epsilon}$.
+\State Initialize $a_i(0)$, $U_i(0)=0$, $Q_i(s,a)$.
+\State $\epsilon(0) \leftarrow \epsilon_0$.
+\State Calculate theoretical bounds: $P_{Tmin}, P_{Tmax}, \Delta U_{Tmin}, \Delta U_{Tmax}$.
+
+\For{$t = 0$ to $T-1$}
+\State \Comment{\textbf{Phase 1: State \& Action}}
+\ForAll{agent $i$}
+\State Determine $\Omega_i$, $\bar{U}_i(t)$ \eqref{eq:rep_avg_model_restored}, $s_i(t)$ \eqref{eq:rep_state_model_restored}.
+\State Select $a_i(t)$ via $\epsilon(t)$-greedy policy.
+\EndFor
+
+\State \Comment{\textbf{Phase 2: Game Play \& Payoff}}
+\ForAll{agent $i$}
+\State Determine $G_i$, calculate $n_C(g, t)$ for $g \in G_i$.
+\State Calculate $P_i(t)$ \eqref{eq:payoff_model_original_restored}.
+\EndFor
+
+\State \Comment{\textbf{Phase 3: Reputation Update}}
+\ForAll{agent $i$}
+\State Calculate $\Delta U_i(t)$ \eqref{eq:rep_change_model_restored}.
+\State $U_i(t+1) \leftarrow \text{clip}(U_i(t) + \Delta U_i(t), -U_{max}, U_{max})$.
+\EndFor
+
+\State \Comment{\textbf{Phase 4: Normalized Reward \& Q-Learn}}
+\ForAll{agent $i$}
+\State Normalize $P_i(t) \to P'_i(t)$ \eqref{eq:payoff_norm_theory_original_restored}.
+\State Normalize $\Delta U_i(t) \to \Delta U'_i(t)$ \eqref{eq:rep_change_norm_theory_model_restored}.
+\State Calculate $R_i(t)$ \eqref{eq:reward_model_normalized_theory_restored}.
+\EndFor
+\ForAll{agent $i$}
+\State Calculate $\bar{U}_i(t+1)$, determine $s_i(t+1)$.
+\State Perform standard Q-learning update \eqref{eq:q_update_model_restored}.
+\EndFor
+
+\State \Comment{\textbf{Phase 5: Neighbor Influence (NI)}}
+\State Calculate global $\Delta R_{gl}(t)$ \eqref{eq:global_diff_model_restored}.
+\ForAll{agent $i$}
+\State Determine $\Omega'_i$. Calculate $\Delta R_{md}(t)$ \eqref{eq:max_diff_model_restored}.
+\If{$\Delta R_{md}(t) > 0$}
+ \State Find $j^*$. Calculate $\lambda_{NI}(t)$ \eqref{eq:nei_weight_model_restored}, $\Delta_{bh}(t)$ \eqref{eq:behavior_model_restored}.
+ \State Adjust $Q_i(s_i(t), a_i(t))$ \eqref{eq:neighbor_update_model_restored}.
+\EndIf
+\EndFor
+
+\State \Comment{\textbf{Phase 6: Exploration Rate}}
+\State $\epsilon(t+1) \leftarrow \max(\epsilon_{min}, \epsilon(t) \cdot \epsilon_{dcy})$.
+\EndFor
+
+\Statex \textbf{Output} Result statistics.
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Notation}
+Key symbols are defined in Table \ref{tab:symbols_model_restored}.
+\begin{table}[htbp]
+\centering
+\caption{Main Symbols and Definitions in the Model}
+\label{tab:symbols_model_restored}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Symbol & Definition \\
+\midrule
+$L$ & Lattice side length (100) \\
+$N_{tot}$ & Total number of agents ($L^2$) \\
+$k$ & PGG group size (5) \\
+$M$ & Perceptual range mode (1: 1st-order, 2: 1st+2nd-order) \\
+$\Omega_i$ & Perceptual range set of agent $i$ (including self) \\
+$N_{per}$ & Number of agents in perceptual range ($|\Omega_i|$) \\
+$\Omega'_i$ & Set of perceived neighbors of $i$ ($\Omega_i \setminus \{i\}$) \\
+$a_i(t)$ & Action of agent $i$ at time $t$ (0: Cooperate C, 1: Defect D) \\
+$c$ & Cost of cooperation per group (1) \\
+$r$ & PGG synergy factor \\
+$P_i(t)$ & \textbf{Raw} total payoff of agent $i$ \eqref{eq:payoff_model_original_restored} \\
+$U_i(t)$ & Reputation value of agent $i$ at time $t$ \\
+$U_{max}$ & Maximum/minimum absolute reputation value (10) \\
+$\delta_C, \delta_D$ & Reputation change for cooperation/defection (1, 1) \\
+$\Delta U_i(t)$ & \textbf{Raw} reputation change of agent $i$ at time $t$ (+1 or -1) \\
+$P_{Tmin}, P_{Tmax}$ & Theoretical minimum/maximum raw payoff ($r-5, 4r$) \\
+$\Delta U_{Tmin}, \Delta U_{Tmax}$ & Theoretical minimum/maximum raw reputation change (-1, +1) \\
+$P'_i(t)$ & \textbf{Theoretically normalized} payoff of agent $i$ \eqref{eq:payoff_norm_theory_original_restored} \\
+$\Delta U'_i(t)$ & \textbf{Theoretically normalized} reputation change of agent $i$ \eqref{eq:rep_change_norm_theory_model_restored} \\
+$\bar{U}_i(t)$ & Average reputation within $i$'s perceptual range \\
+$s_i(t)$ & Binary state of agent $i$ at time $t$ (0 or 1) \\
+$Q_i(s, a)$ & Q-table of agent $i$ (state-action value function) \\
+$R_i(t)$ & \textbf{Normalized} composite reward received by agent $i$ at time $t$ \\
+$w_P, w_R$ & Weights of normalized payoff/reputation change in reward ($w_P+w_R=1$) \\
+$\eta$ & Q-learning learning rate (0.8) \\
+$\gamma$ & Q-learning discount factor (0.9) \\
+$\epsilon(t)$ & Exploration rate of $\epsilon$-greedy policy at time $t$ \\
+$\epsilon_0, \epsilon_{min}, \epsilon_{dcy}$ & Exploration rate parameters (0.5, 0.01, 0.99) \\
+$\Delta R_{ij}(t)$ & \textbf{Normalized} comprehensive reward difference of $j$ relative to $i$ \\
+$\Delta R_{md}(t)$ & Max positive \textbf{normalized} comprehensive reward difference among $i$'s perceived neighbors \\
+$\Delta R_{gl}(t)$ & Global max absolute \textbf{normalized} comprehensive reward difference  \\
+$\lambda_{\epsilon}$ & Global difference regularization constant (0.01) \\
+$\kappa$ & Neighbor influence factor (controls NI strength) \\
+$\lambda_{NI}(t)$ & Normalized neighbor influence weight \\
+$\Delta_{bh}(t)$ & Behavioral consistency adjustment term (+1 or -1) \\
+$\text{NI}(t)$ & Percentage of NI in total Q-value update \\
+$T$ & Total simulation time steps \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\section{Experiments and Results}
+\label{sec:results}
+
+This section presents and analyzes simulation results to elucidate the impact of the neighbor influence factor ($\kappa$), reward composition ($w_P$), and perceptual range ($M$) on cooperative dynamics in SPGG. All results are averaged over 10 independent runs to ensure statistical robustness. Time evolution plots are shown for enough time steps to guarantee convergence to a stationary state.
+
+\subsection{The Promoting Effect of Neighbor Influence Strength ($\kappa$) on Cooperation}
+
+We first examined how the NI mechanism's core parameter, $\kappa$, regulates cooperation. Fig. \ref{fig:heatmap_of_kappa} displays average steady-state cooperation under varying synergy factor $r$ and $\kappa$ (with $w_P=1$, excluding direct reputation effects). This heatmap highlights NI's crucial role. When $r$ is low (e.g., $\le 3.0$), cooperation struggles to emerge even with NI ($\kappa > 0$), indicating the fundamental importance of the game's payoff structure. However, once $r$ surpasses a threshold, $\kappa$'s effect becomes evident. Without NI ($\kappa=0$), cooperation may remain minimal. As $\kappa$ increases, cooperation rapidly rises, demonstrating NI's efficacy in fostering cooperation. Intriguingly, for some $r$ (e.g., $r=4.5$), a very small $\kappa$ (e.g., 0.1) might slightly decrease cooperation compared to $\kappa=0$. Yet, further increases in $\kappa$ markedly enhance cooperation, suggesting NI needs a certain ``strength'' to be effective. Comparing $M=1$ and $M=2$, a larger perceptual range ($M=2$) often yields higher cooperation across a broader parameter space for the same $\kappa$, indicating an interaction between perceptual range and NI.
+
+\begin{figure}[htbp]
+ \centering
+ \begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{Fig1a.pdf}
+  
+  \label{fig:heatmap_kappa_m1}
+ \end{subfigure}\hfill
+ \begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{Fig1b.pdf}
+  
+  \label{fig:heatmap_kappa_m2}
+ \end{subfigure}
+ \caption{Joint effect of synergy factor $r$ and neighbor influence factor $\kappa$ on the final fraction of cooperation ($w_P=1$). The heatmaps demonstrate that the NI mechanism is crucial for promoting cooperation, especially when the synergy factor $r$ surpasses a critical threshold, and that a larger perceptual range ($M=2$) further enhances this effect.}
+ \label{fig:heatmap_of_kappa}
+\end{figure}
+
+To observe NI's impact on cooperative dynamics more closely, Fig. \ref{fig:effect_of_kappa} shows the fraction of cooperation evolving over time for different $\kappa$ values (fixed $r=3.6, w_P=1$). When $\kappa=0$, cooperation rapidly declines after initial fluctuations, confirming standard Q-learning's difficulty in maintaining cooperation under these parameters. As $\kappa$ increases, cooperation rises. Even a moderate $\kappa=0.5$ shows an initial decrease followed by a significant rebound to a high level. Larger $\kappa$ values lead to earlier rebounds and faster ascents. Comparing $M=1$ (Fig. \ref{fig:effect_of_kappa}a) and $M=2$ (Fig. \ref{fig:effect_of_kappa}b), cooperation is generally higher and rises faster for $M=2$ (for $\kappa > 0$), further confirming the beneficial role of an expanded perceptual range.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{Figure_2.pdf}
+ \caption{Effect of neighbor influence factor $\kappa$ on the dynamics of the fraction of cooperation ($r=3.6, w_P=1$).  The results clearly show that increasing $\kappa$ not only elevates the final cooperation level but also significantly accelerates its emergence, overcoming the failure of standard Q-learning ($\kappa=0$).}
+ \label{fig:effect_of_kappa}
+\end{figure}
+
+Under certain parameters, the fraction of cooperation's initial decrease followed by an increase, reminiscent of Fermi-update dynamics, suggests cluster formation. Spatial snapshots for $M=1, r=3.6, w_P=1$ (Fig. \ref{fig:lattice_diff_kappa}) illustrate this. Without NI ($\kappa=0$, top row), cooperators (gray) and defectors (black) remain intermingled, and cooperators are exploited. With NI ($\kappa=0.5$, bottom row), although cooperators may be invaded early ($t=100$), they later form distinct, stable clusters ($t=1000, t=10000$) that can expand. This exemplifies network reciprocity, facilitated for RL agents by the NI mechanism.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tabular}{@{}c @{\hspace{1em}} c@{}}
+ $\kappa=0$ &
+ \begin{minipage}[c]{0.85\textwidth}
+\centering
+\begin{subfigure}[b]{0.3\linewidth} \centering \caption*{$t=100$} \includegraphics[width=\linewidth]{lattice_k0_t100.png} \end{subfigure}\hfill
+\begin{subfigure}[b]{0.3\linewidth} \centering \caption*{$t=1000$} \includegraphics[width=\linewidth]{lattice_k0_t1000.png} \end{subfigure}\hfill
+\begin{subfigure}[b]{0.3\linewidth} \centering \caption*{$t=10000$} \includegraphics[width=\linewidth]{lattice_k0_t10000.png} \end{subfigure}
+ \end{minipage} \\
+ \noalign{\vspace{1em}}
+ $\kappa=0.5$ &
+ \begin{minipage}[c]{0.85\textwidth}
+\centering
+\begin{subfigure}[b]{0.3\linewidth} \centering \includegraphics[width=\linewidth]{lattice_k0.5_t100.png} \end{subfigure}\hfill
+\begin{subfigure}[b]{0.3\linewidth} \centering \includegraphics[width=\linewidth]{lattice_k0.5_t1000.png} \end{subfigure}\hfill
+\begin{subfigure}[b]{0.3\linewidth} \centering \includegraphics[width=\linewidth]{lattice_k0.5_t10000.png} \end{subfigure}
+ \end{minipage} \\
+  \end{tabular}
+  \caption{Effect of Neighbor Influence (NI) on spatial pattern evolution ($r=3.6, w_P=1.0, M=1$). Gray represents cooperators, and black represents defectors. These snapshots provide visual evidence that with NI (bottom row), cooperators form stable and expanding clusters---a hallmark of network reciprocity---which is absent without NI (top row).}
+  \label{fig:lattice_diff_kappa}
+\end{figure}
+
+To quantify NI's contribution, Fig. \ref{fig:nei_per_diffK} plots the average proportion of the Q-value adjustment due to NI \eqref{eq:neighbor_influence_percentage_restored}. For $\kappa > 0$, the NI proportion is higher early in the simulations, then decreases and stabilizes. This is intuitive; during early learning, strategies are more random, making NI's guidance role more significant. As strategies converge, performance differences diminish, reducing the frequency and magnitude of NI adjustments. Larger $\kappa$ values yield higher peak and stable NI proportions. However, even initially, its average proportion typically does not exceed 50\%-60\%, indicating that Q-values result from a combination of both individual RL experience and NI guidance, rather than NI entirely dictating outcomes.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=0.7\linewidth]{Figure_4.pdf}
+ \caption{Average relative contribution of Neighbor Influence (NI) to total Q-value updates ($M=1, r=3.6, w_P=1$). This figure illustrates that NI's contribution is most significant during the initial, uncertain phase of learning and diminishes as strategies stabilize, highlighting its role as a guiding force rather than a dictatorial one.}
+ \label{fig:nei_per_diffK}
+\end{figure}
+
+\subsection{The Modulatory Role of Reward Composition ($w_P$) and Reputation}
+\label{subsec:effect_of_wp}
+
+This section explores how the payoff weight $w_P$ (and thus reputation weight $w_R=1-w_P$) affects cooperation. We first examine reputation's impact without NI ($\kappa=0$).
+
+Fig. \ref{fig:heatmap_of_wp} shows the joint effect of $r$ and $w_P$ on final cooperation ($\kappa=0$). Notably, if reputation holds some sway in rewards ($w_P < 0.8$), high cooperation is achievable across a wide range of $r$, including lower $r$ values where purely payoff-driven RL ($w_P=1$) struggles. This suggests that concern for reputation can promote cooperation. However, a threshold exists: if $w_P$ is very close to 1 (minimal reputation weight), cooperation plummets. This indicates that reputational concern must be sufficiently potent to counteract short-term defection incentives.
+Interestingly, for $w_P$ values between approximately 0.78 and 0.85, cooperation can show a slight non-monotonic dip as $r$ increases from low values. The root of this phenomenon lies in the fact that, although the contribution of reputation to the composite reward is not high in either case, subtle shifts in its relative influence are sufficient to alter the learning dynamics, as illustrated in Fig. \ref{fig:reward_vs_coop}. At $r=1.0$, the relative contribution of the reputation reward (see Fig. \ref{fig:reward_vs_coop}b) is slightly higher than it is at $r=2.0$. This marginal advantage, set against a backdrop of low payoff returns, is enough to more effectively guide agents toward learning cooperative strategies, thus sustaining a higher level of cooperation at $r=1.0$. When $r$ increases to 2.0, the relative influence of reputation is further diminished, yet the intrinsic incentive from $r$ itself is not yet strong enough to compensate for this reduction, leading to a temporary decline in cooperation. Only when $r$ increases further, and its own powerful promotional effect becomes dominant, does the cooperation level robustly recover and rise.
+Comparing $M=1$ (Fig. \ref{fig:heatmap_of_wp}a) and $M=2$ (Fig. \ref{fig:heatmap_of_wp}b) for $\kappa=0$, the patterns are similar. This contrasts with the significant impact of $M$ when NI is active (Fig. \ref{fig:heatmap_of_kappa}), suggesting that, absent NI, reputation primarily acts by altering individual reward signals, with the perceptual range $M$ having little effect on its own.
+
+\begin{figure}[htbp]
+ \centering
+ \begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{Fig5a.pdf}
+  \label{fig:heatmap_wp_m1}
+ \end{subfigure}\hfill
+ \begin{subfigure}[t]{0.48\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{Fig5b.pdf}
+  \label{fig:heatmap_wp_m2}
+ \end{subfigure}
+ \caption{Joint effect of payoff weight $w_P$ (and reputation weight $w_R=1-w_P$) and synergy factor $r$ on the final fraction of cooperation ($\kappa=0$). These results show that a sufficient weight given to reputation ($w_P<0.8$) can effectively promote cooperation on its own, even in the absence of the NI mechanism.}
+ \label{fig:heatmap_of_wp}
+\end{figure}
+
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{Figure_Reward_vs_Coop_SideBySide.pdf}
+ \caption{Explanation for the non-monotonic cooperation trend seen in Fig. \ref{fig:heatmap_of_wp} (parameters: $w_P=0.83, M=1, \kappa=0$). (a) Evolution of cooperation for $r=1.0$ and $r=2.0$. (b) Average contribution of the reputation component to the total reward for cooperators. At $r=1.0$, the relative contribution of the reputation component is higher, providing a stronger learning signal that promotes cooperation. This explains why cooperation is higher at $r=1.0$ than at $r=2.0$, where the reputation signal is comparatively weaker relative to the growing payoff incentives.}
+\label{fig:reward_vs_coop}
+ \label{fig:reward_vs_coop}
+\end{figure}
+
+
+To understand potential synergies, we compared cooperation dynamics in three scenarios at $r=3.0$: sole reputation incentive ($\kappa=0, w_P=0.95$), sole NI ($\kappa=1.0, w_P=1.0$), and a hybrid mechanism ($\kappa=1.0, w_P=0.95$). Fig. \ref{fig:cop_3} shows that at $r=3.0, w_P=0.95$, the sole reputation incentive (green curve) has limited effect. The sole NI mechanism (orange curve) is also ineffective for $M=1$ at this low $r$, but it promotes cooperation for $M=2$, albeit slowly. In contrast, the hybrid mechanism (blue curve) significantly enhances both the dynamics and the final level of cooperation in both cases. This strongly indicates a positive synergy: reputation modifies the reward landscape to make cooperation intrinsically more appealing, while NI provides the spatial learning mechanism to effectively form and sustain cooperative clusters.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{Figure_6.pdf}
+ \caption{Evolution of the fraction of cooperation under three mechanisms ($r=3.0$). Blue: hybrid; Green: sole reputation; Orange: sole NI. This comparison reveals a strong synergistic effect, where the combination of NI and reputation (blue curve) dramatically outperforms either mechanism in isolation, succeeding even where both fail individually.}
+ \label{fig:cop_3}
+\end{figure}
+
+Spatial reputation snapshots (Fig. \ref{fig:reputation_vs_no_reputation}) offer intuitive evidence. With only a limitedly effective reputation incentive (top row, $\kappa=0, w_P=0.95$), defectors dominate. Under the hybrid mechanism (bottom row, $\kappa=1.0, w_P=0.95$), distinct, spatially clustered regions of high (light) and low (dark) reputation emerge, corresponding to cooperator and defector clusters. This spatial reputation distribution signals the formation of stable cooperator clusters, where reputation provides richer ``success signals'' for the NI mechanism, creating a positive feedback loop.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\linewidth]{Figure_7.pdf}
+ \caption{Evolution of the spatial reputation distribution under three different mechanisms. Top: Sole reputation ($r=3.6, w_P=0.95, M=1$,$\kappa=0$). Middle: Sole NI ($r=3.6, w_P=1.0, M=1$,$\kappa=1.0$). Bottom: Hybrid mechanism ($r=3.6, w_P=0.95, M=1$,$\kappa=1.0$). Color indicates reputation value. The hybrid mechanism (bottom) is uniquely capable of fostering clear, stable clusters of high-reputation cooperators, which is not achieved by the individual mechanisms.}
+ \label{fig:reputation_vs_no_reputation}
+\end{figure}
+
+\subsection{The Impact of Perceptual Range ($M$) on Cooperative Evolution}
+
+Finally, we examine how perceptual range $M$ modulates cooperation, particularly under NI. Fig. \ref{fig:typical_dynamics} compares cooperation evolution for $M=1$ and $M=2$ ($r=3.0, \kappa=1.0, w_P=0.95$). With NI, $M=2$ significantly enhances convergence speed and final cooperation. Conversely, without NI, expanding $M$ has a negligible effect. This indicates that $M$ primarily amplifies NI's effect by broadening its informational input, not by directly affecting standard Q-learning.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{Figure_8.pdf}
+  \caption{Impact of perceptual range $M$ on the fraction of cooperation evolution ($r=3.0, w_P=0.95$). Blue: M=1, Orange: M=2. This figure demonstrates that a larger perceptual range provides a significant advantage only when the NI mechanism is active (a), confirming that its benefit is channeled through social learning.}
+  \label{fig:typical_dynamics}
+\end{figure}
+
+The reason $M=2$ better promotes cooperation lies in its expansion of NI's information sources. Fig. \ref{fig:influence_order_s} analyzes the origin of the best-performing neighbor $j^*$ that triggers NI under $M=2$. Second-order neighbors account for the majority of NI events (approx. 55\%-72.5\%). Agents can thus learn from successful experiences in a broader local environment. This expanded informational horizon bolsters NI's ability to guide agents towards effective cooperative strategies.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=0.7\linewidth]{Figure_9.pdf}
+ \caption{Source analysis of the best-performing neighbor $j^*$ triggering NI under $M=2$ ($r=3.0, \kappa=1.0, w_P=0.95$). The plot shows the percentage of NI events originating from second-order neighbors. The key message is that access to more distant, successful "role models" is not a minor effect but a major contributor to the learning process, accounting for the majority of influential events.}
+ \label{fig:influence_order_s}
+\end{figure}
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{Figure_Coop_vs_Stability_Comparison.pdf}
+    \caption{Comparison of state representation methods on cooperation and policy stability ($r=4.6, w_P=1.0, \kappa=0, M=1$). "Reputation State" is our proposed model where state is based on neighborhood reputation. "Action State" is a conventional model where state is the agent's own previous action. (a) Evolution of cooperation. (b) Number of strategy switches per step. Our model achieves comparable cooperation with significantly higher policy stability (fewer switches), indicating more robust learned behaviors.}
+    \label{fig:stability_comparison}
+\end{figure}
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This study developed and evaluated an SPGG model integrating Q-learning with a Neighbor Influence (NI) mechanism, elucidating NI's regulatory role and its interplay with key parameters. Our findings indicate that NI, a Q-value adjustment based on neighbors' relative rewards, is a critical factor for achieving network reciprocity and promoting cooperator clustering. Standard Q-learning often fails to spontaneously leverage spatial structure; NI, by integrating local social information, guides cooperative strategies to cluster spatially. While its operational mode differs from traditional imitation-based network reciprocity, its essence is value assessment adjustment. NI's efficacy is evident in its capacity to markedly improve cooperation where standard RL falters (Figs. \ref{fig:heatmap_of_kappa} and \ref{fig:effect_of_kappa}) and to foster clear cooperator clusters (Fig. \ref{fig:lattice_diff_kappa}). The dynamics of NI's contribution (Fig. \ref{fig:nei_per_diffK}) show early-stage guidance and later-stage stability enhancement, showcasing its adaptability. The reputation mechanism, by modulating rewards (Fig. \ref{fig:heatmap_of_wp}), primarily influences individual motivation yet lacks the direct capacity to induce spatial structuring without NI. However, when combined with NI, they yield potent synergistic effects: reputation provides intrinsic motivation, while NI constructs the spatial structure, leading to a more effective emergence and sustainment of cooperation. The perceptual range $M$'s impact is mainly evident via NI (Fig. \ref{fig:typical_dynamics}); a larger range implies access to more "role models," amplifying NI's benefits (Fig. \ref{fig:influence_order_s}) and underscoring the importance of information scope in social learning.
+
+This model's approach offers a novel perspective on how social information influences individual value judgment and learning, clearly demonstrating NI's potential to address standard RL's limitations in SPGG. Our design choices were deliberate. Using the instantaneous reputation change $\Delta U_i(t)$ as a reward component, rather than the accumulated reputation $U_i(t)$, aligns with the core principle of reinforcement learning, where rewards should reflect the immediate consequence of a given action. Furthermore, we chose to define an agent's state based on the average reputation of its neighborhood rather than more self-focused metrics like its own past action. This frames the learning problem in a richer social context. As demonstrated in Fig. \ref{fig:stability_comparison}, while a self-focused state representation might yield marginally higher cooperation under specific conditions, our social-context state leads to significantly more stable policies, evidenced by a drastic reduction in strategy switching. This stability suggests that agents learn more robust, less-reactive strategies by conditioning their behavior on the local social climate, which is a key advantage and a departure from many traditional learning models. This exploratory study has limitations, including model simplifications (e.g., binary state/action space) and static environment assumptions. Future avenues include exploring more nuanced state representations, diverse social comparison rules, heterogeneous networks, dynamic environments, and pursuing theoretical analyses and empirical validation. In summary, this research underscores the NI mechanism's critical role in overcoming standard RL's limitations, promoting cooperator clustering, and achieving network reciprocity. Reputation and perceptual range, as key moderators, can synergize with NI to shape cooperative landscapes. These findings not only offer a novel computational model and theoretical insights into the links between individual learning, local interactions, and macroscopic cooperation but also provide valuable guidance for designing strategies to promote beneficial social behaviors.
+
+
+
+\section*{CRediT authorship contribution statement}
+
+\noindent 
+\textbf{Hongwei Kang}: Methodology, Funding acquisition, Conceptualization. \\
+\textbf{Chao Jiang}: Writing – original draft, Methodology, Formal analysis. \\
+\textbf{Yong Shen}: Writing – review \& editing, Funding acquisition. \\
+\textbf{Xingping Sun}: Writing – review \& editing, Funding acquisition. \\
+\textbf{Qingyi Chen}: Writing – review \& editing.
+
+\section*{Declaration of competing interest}
+
+\noindent The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\section*{Acknowledgments}
+\noindent This research was supplied by Open Foundation of Key Laboratory of Software Engineering of Yunnan Province (Grant Nos. 2020SE308 and 2020SE309), The new round of Double First-class Project of Yunnan University (Grant Nos. CY22624103), and The National Natural Science Foundation of China (Grant Nos. 62366057).
+
+\section*{Data and Code Availability}
+\noindent No data was used for the research described in the article. The source code is currently being organized and annotated to ensure its usability for other researchers. We commit to making the code publicly available on a platform such as GitHub upon the manuscript's publication.
+
+
+
+\bibliographystyle{elsarticle-num}
+\bibliography{references}
+
+\end{document}
