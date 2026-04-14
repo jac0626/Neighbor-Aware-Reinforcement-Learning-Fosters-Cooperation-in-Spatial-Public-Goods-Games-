@@ -1,0 +1,319 @@
+name: SPGG GitHub Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      experiment_preset:
+        description: Select a predefined experiment or choose custom
+        required: true
+        default: submission_main
+        type: choice
+        options:
+          - smoke
+          - submission_main
+          - submission_structure
+          - submission_robustness_sync
+          - submission_robustness_async
+          - custom
+      experiment_dir:
+        description: Experiment directory relative to repo root
+        required: true
+        default: pure_dqn_spgg/vanilla_dqn_spgg
+        type: string
+      output_name:
+        description: Prefix for results and artifacts
+        required: true
+        default: submission-main
+        type: string
+      python_version:
+        description: Python version for the runner
+        required: true
+        default: "3.11"
+        type: string
+      methods:
+        description: Space/comma separated methods
+        required: true
+        default: fermi tabular_q dqn_self dqn_local dqn_vonn dqn_wide dqn_history
+        type: string
+      r_values:
+        description: Space/comma separated r values
+        required: true
+        default: 2.0 2.5 3.0 3.2 3.4 3.6 3.8 4.0 4.2 4.4 4.6 5.0
+        type: string
+      seeds:
+        description: Space/comma separated seeds
+        required: true
+        default: 2026 2027 2028 2029 2030
+        type: string
+      shards:
+        description: Number of parallel shards
+        required: true
+        default: "12"
+        type: string
+      grid_size:
+        description: Lattice size
+        required: true
+        default: "100"
+        type: string
+      iterations:
+        description: Iterations per experiment
+        required: true
+        default: "100000"
+        type: string
+      tail_length:
+        description: Tail window for equilibrium stats
+        required: true
+        default: "5000"
+        type: string
+      history_len:
+        description: History length for dqn_history
+        required: true
+        default: "3"
+        type: string
+      save_frames_interval:
+        description: Frame interval, 0 disables snapshots
+        required: true
+        default: "0"
+        type: string
+      update_prob:
+        description: Agent update probability
+        required: true
+        default: "1.0"
+        type: string
+      epsilon:
+        description: Initial epsilon for DQN methods
+        required: true
+        default: "0.5"
+        type: string
+      epsilon_decay:
+        description: Epsilon decay for DQN methods
+        required: true
+        default: "0.9995"
+        type: string
+      epsilon_min:
+        description: Minimum epsilon for DQN methods
+        required: true
+        default: "0.0"
+        type: string
+      workers_per_runner:
+        description: Local worker count inside each shard
+        required: true
+        default: "1"
+        type: string
+      adaptive_stop:
+        description: Enable convergence-based early stop
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      save_models:
+        description: Save per-run DQN checkpoints
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      upload_raw_results:
+        description: Upload full shard run directories
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+concurrency:
+  group: spgg-github-runner-${{ github.ref }}-${{ inputs.output_name }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      run_name: ${{ steps.meta.outputs.run_name }}
+      experiment_dir: ${{ steps.meta.outputs.experiment_dir }}
+      python_version: ${{ steps.meta.outputs.python_version }}
+      preset: ${{ steps.resolve.outputs.preset }}
+      methods: ${{ steps.resolve.outputs.methods }}
+      r_values: ${{ steps.resolve.outputs.r_values }}
+      seeds: ${{ steps.resolve.outputs.seeds }}
+      shards: ${{ steps.resolve.outputs.shards }}
+      grid_size: ${{ steps.resolve.outputs.grid_size }}
+      iterations: ${{ steps.resolve.outputs.iterations }}
+      tail_length: ${{ steps.resolve.outputs.tail_length }}
+      history_len: ${{ steps.resolve.outputs.history_len }}
+      save_frames_interval: ${{ steps.resolve.outputs.save_frames_interval }}
+      update_prob: ${{ steps.resolve.outputs.update_prob }}
+      epsilon: ${{ steps.resolve.outputs.epsilon }}
+      epsilon_decay: ${{ steps.resolve.outputs.epsilon_decay }}
+      epsilon_min: ${{ steps.resolve.outputs.epsilon_min }}
+      workers_per_runner: ${{ steps.resolve.outputs.workers_per_runner }}
+      adaptive_stop: ${{ steps.meta.outputs.adaptive_stop }}
+      save_models: ${{ steps.meta.outputs.save_models }}
+      upload_raw_results: ${{ steps.meta.outputs.upload_raw_results }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        shell: bash
+        run: |
+          echo "run_name=${{ inputs.output_name }}-run${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          echo "experiment_dir=${{ inputs.experiment_dir }}" >> "$GITHUB_OUTPUT"
+          echo "python_version=${{ inputs.python_version }}" >> "$GITHUB_OUTPUT"
+          echo "adaptive_stop=${{ inputs.adaptive_stop }}" >> "$GITHUB_OUTPUT"
+          echo "save_models=${{ inputs.save_models }}" >> "$GITHUB_OUTPUT"
+          echo "upload_raw_results=${{ inputs.upload_raw_results }}" >> "$GITHUB_OUTPUT"
+
+      - id: resolve
+        working-directory: ${{ inputs.experiment_dir }}
+        shell: bash
+        run: |
+          python3 gha_resolve_preset.py \
+            --preset "${{ inputs.experiment_preset }}" \
+            --methods "${{ inputs.methods }}" \
+            --r-values "${{ inputs.r_values }}" \
+            --seeds "${{ inputs.seeds }}" \
+            --shards "${{ inputs.shards }}" \
+            --grid-size "${{ inputs.grid_size }}" \
+            --iterations "${{ inputs.iterations }}" \
+            --tail-length "${{ inputs.tail_length }}" \
+            --history-len "${{ inputs.history_len }}" \
+            --save-frames-interval "${{ inputs.save_frames_interval }}" \
+            --update-prob "${{ inputs.update_prob }}" \
+            --epsilon "${{ inputs.epsilon }}" \
+            --epsilon-decay "${{ inputs.epsilon_decay }}" \
+            --epsilon-min "${{ inputs.epsilon_min }}" \
+            --workers-per-runner "${{ inputs.workers_per_runner }}" \
+            --github-output "$GITHUB_OUTPUT"
+
+      - id: matrix
+        working-directory: ${{ inputs.experiment_dir }}
+        shell: bash
+        run: |
+          python3 gha_build_matrix.py \
+            --methods "${{ steps.resolve.outputs.methods }}" \
+            --r-values "${{ steps.resolve.outputs.r_values }}" \
+            --seeds "${{ steps.resolve.outputs.seeds }}" \
+            --shards "${{ steps.resolve.outputs.shards }}" \
+            --github-output "$GITHUB_OUTPUT"
+
+  run-shard:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    defaults:
+      run:
+        working-directory: ${{ needs.prepare.outputs.experiment_dir }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ needs.prepare.outputs.python_version }}
+          cache: pip
+          cache-dependency-path: ${{ needs.prepare.outputs.experiment_dir }}/requirements-github-actions.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-github-actions.txt
+
+      - name: Run shard
+        env:
+          JOBS_JSON: ${{ matrix.jobs_json }}
+          SHARD_ROOT: results/github_actions/${{ needs.prepare.outputs.run_name }}/${{ matrix.shard_name }}
+        shell: bash
+        run: |
+          extra_args=()
+          if [ "${{ needs.prepare.outputs.adaptive_stop }}" = "true" ]; then
+            extra_args+=("--enable-adaptive-stop")
+          fi
+          if [ "${{ needs.prepare.outputs.save_models }}" = "true" ]; then
+            extra_args+=("--save-model")
+          fi
+
+          python gha_run_shard.py \
+            --jobs-json "$JOBS_JSON" \
+            --output-root "$SHARD_ROOT" \
+            --iterations "${{ needs.prepare.outputs.iterations }}" \
+            --grid-size "${{ needs.prepare.outputs.grid_size }}" \
+            --save-frames-interval "${{ needs.prepare.outputs.save_frames_interval }}" \
+            --tail-length "${{ needs.prepare.outputs.tail_length }}" \
+            --history-len "${{ needs.prepare.outputs.history_len }}" \
+            --update-prob "${{ needs.prepare.outputs.update_prob }}" \
+            --epsilon "${{ needs.prepare.outputs.epsilon }}" \
+            --epsilon-decay "${{ needs.prepare.outputs.epsilon_decay }}" \
+            --epsilon-min "${{ needs.prepare.outputs.epsilon_min }}" \
+            --workers "${{ needs.prepare.outputs.workers_per_runner }}" \
+            "${extra_args[@]}"
+
+      - name: Upload shard summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: spgg-summary-${{ needs.prepare.outputs.run_name }}-${{ matrix.shard_name }}
+          retention-days: 90
+          path: |
+            ${{ needs.prepare.outputs.experiment_dir }}/results/github_actions/${{ needs.prepare.outputs.run_name }}/${{ matrix.shard_name }}/summary.csv
+            ${{ needs.prepare.outputs.experiment_dir }}/results/github_actions/${{ needs.prepare.outputs.run_name }}/${{ matrix.shard_name }}/shard_manifest.json
+
+      - name: Upload shard raw results
+        if: needs.prepare.outputs.upload_raw_results == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: spgg-raw-${{ needs.prepare.outputs.run_name }}-${{ matrix.shard_name }}
+          retention-days: 30
+          path: ${{ needs.prepare.outputs.experiment_dir }}/results/github_actions/${{ needs.prepare.outputs.run_name }}/${{ matrix.shard_name }}/runs
+
+  aggregate:
+    needs:
+      - prepare
+      - run-shard
+    runs-on: ubuntu-latest
+    if: ${{ always() && needs.prepare.result == 'success' }}
+    defaults:
+      run:
+        working-directory: ${{ needs.prepare.outputs.experiment_dir }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ needs.prepare.outputs.python_version }}
+          cache: pip
+          cache-dependency-path: ${{ needs.prepare.outputs.experiment_dir }}/requirements-github-actions.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-github-actions.txt
+
+      - name: Download shard summaries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: spgg-summary-${{ needs.prepare.outputs.run_name }}-*
+          path: ${{ github.workspace }}/downloaded-shards
+          merge-multiple: false
+
+      - name: Merge shard summaries
+        run: |
+          python gha_merge_shards.py \
+            --input-dir "${{ github.workspace }}/downloaded-shards" \
+            --output-dir "results/github_actions/${{ needs.prepare.outputs.run_name }}/aggregate" \
+            --plot-output "results/github_actions/${{ needs.prepare.outputs.run_name }}/aggregate/phase_diagram.png"
+
+      - name: Upload aggregate artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spgg-aggregate-${{ needs.prepare.outputs.run_name }}
+          retention-days: 90
+          path: |
+            ${{ needs.prepare.outputs.experiment_dir }}/results/github_actions/${{ needs.prepare.outputs.run_name }}/aggregate/summary.csv
+            ${{ needs.prepare.outputs.experiment_dir }}/results/github_actions/${{ needs.prepare.outputs.run_name }}/aggregate/merged_manifest.json
+            ${{ needs.prepare.outputs.experiment_dir }}/results/github_actions/${{ needs.prepare.outputs.run_name }}/aggregate/phase_diagram.png
