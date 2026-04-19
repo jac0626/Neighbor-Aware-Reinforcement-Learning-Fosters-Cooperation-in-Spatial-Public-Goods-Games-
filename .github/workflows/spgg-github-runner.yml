@@ -100,6 +100,11 @@ on:
         required: true
         default: "1"
         type: string
+      threads_per_worker:
+        description: BLAS and PyTorch threads used by each worker process
+        required: true
+        default: "1"
+        type: string
       adaptive_stop:
         description: Enable convergence-based early stop
         required: true
@@ -152,6 +157,7 @@ jobs:
       epsilon_decay: ${{ steps.resolve.outputs.epsilon_decay }}
       epsilon_min: ${{ steps.resolve.outputs.epsilon_min }}
       workers_per_runner: ${{ steps.resolve.outputs.workers_per_runner }}
+      threads_per_worker: ${{ steps.resolve.outputs.threads_per_worker }}
       adaptive_stop: ${{ steps.meta.outputs.adaptive_stop }}
       save_models: ${{ steps.meta.outputs.save_models }}
       upload_raw_results: ${{ steps.meta.outputs.upload_raw_results }}
@@ -188,6 +194,7 @@ jobs:
             --epsilon-decay "${{ inputs.epsilon_decay }}" \
             --epsilon-min "${{ inputs.epsilon_min }}" \
             --workers-per-runner "${{ inputs.workers_per_runner }}" \
+            --threads-per-worker "${{ inputs.threads_per_worker }}" \
             --github-output "$GITHUB_OUTPUT"
 
       - id: matrix
@@ -229,6 +236,12 @@ jobs:
         env:
           JOBS_JSON: ${{ matrix.jobs_json }}
           SHARD_ROOT: results/github_actions/${{ needs.prepare.outputs.run_name }}/${{ matrix.shard_name }}
+          OMP_NUM_THREADS: ${{ needs.prepare.outputs.threads_per_worker }}
+          OPENBLAS_NUM_THREADS: ${{ needs.prepare.outputs.threads_per_worker }}
+          MKL_NUM_THREADS: ${{ needs.prepare.outputs.threads_per_worker }}
+          VECLIB_MAXIMUM_THREADS: ${{ needs.prepare.outputs.threads_per_worker }}
+          NUMEXPR_NUM_THREADS: ${{ needs.prepare.outputs.threads_per_worker }}
+          BLIS_NUM_THREADS: ${{ needs.prepare.outputs.threads_per_worker }}
         shell: bash
         run: |
           extra_args=()
@@ -252,6 +265,7 @@ jobs:
             --epsilon-decay "${{ needs.prepare.outputs.epsilon_decay }}" \
             --epsilon-min "${{ needs.prepare.outputs.epsilon_min }}" \
             --workers "${{ needs.prepare.outputs.workers_per_runner }}" \
+            --threads-per-worker "${{ needs.prepare.outputs.threads_per_worker }}" \
             "${extra_args[@]}"
 
       - name: Upload shard summary

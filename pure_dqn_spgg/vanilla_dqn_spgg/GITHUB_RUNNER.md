@@ -21,6 +21,12 @@ one serial job.
 3. `aggregate` downloads all shard summaries, merges them, and generates a
    phase diagram artifact.
 
+The GitHub-hosted version is tuned for summary-first replication:
+
+- more shards to reduce per-job runtime
+- optional multi-process execution inside each shard
+- capped BLAS/PyTorch threads per worker to avoid oversubscription
+
 Each shard writes outputs to:
 
 ```text
@@ -64,14 +70,31 @@ For `submission_main`, the preset expands to:
 - `methods`: `fermi tabular_q dqn_self dqn_local dqn_vonn dqn_wide dqn_history`
 - `r_values`: `2.0 2.5 3.0 3.2 3.4 3.6 3.8 4.0 4.2 4.4 4.6 5.0`
 - `seeds`: `2026 2027 2028 2029 2030 2031 2032 2033 2034 2035`
-- `shards`: `12` to `24`
+- `shards`: `96`
 - `grid_size`: `100`
 - `iterations`: `100000`
 - `tail_length`: `5000`
+- `workers_per_runner`: `2`
+- `threads_per_worker`: `1`
 - `save_frames_interval`: `0`
 - `save_models`: `false`
 - `upload_raw_results`: `false` for scouting, `true` only when you really need
   the raw HDF5 outputs
+
+## Why Smaller Shards
+
+GitHub-hosted jobs have a hard execution cap of 6 hours, and GitHub Actions
+matrix jobs are capped at 256 jobs per workflow run. The current presets stay
+within that matrix limit while pushing the per-shard job count down far enough
+that long DQN sweeps are less likely to be cancelled.
+
+If one preset still times out, do not increase `workers_per_runner` first.
+Instead:
+
+1. increase `shards`
+2. keep `threads_per_worker=1`
+3. keep `save_frames_interval=0`
+4. keep `save_models=false` unless checkpoints are necessary
 
 ## Why `save_models=false`
 
@@ -86,7 +109,20 @@ checkpoint-free shard runs unless you explicitly enable model saving.
 3. Run `SPGG GitHub Runner`.
 4. Select `experiment_preset`.
 5. If needed, switch to `custom` and edit the raw parameter fields.
-6. Download the final `spgg-aggregate-*` artifact after the workflow completes.
+6. For custom runs, prefer `workers_per_runner=2` and `threads_per_worker=1` on GitHub-hosted Linux runners.
+7. Keep snapshot-heavy figure generation local unless the underlying parameter scan itself is too large.
+8. Download the final `spgg-aggregate-*` artifact after the workflow completes.
+
+## Keep Local
+
+These are usually better left on your local machine:
+
+- representative spatial snapshots
+- long time-evolution curves for a few selected `r` values
+- final publication figure polishing
+
+GitHub-hosted runners are best used for summary-oriented sweeps that end in
+`summary.csv`, not for artifact-heavy visualization runs.
 
 ## Outputs You Get
 

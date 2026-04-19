@@ -96,3 +96,43 @@ Key statistics to report:
 - standard deviation across seeds
 - mean tail raw payoff
 - representative spatial snapshots near the transition region
+
+## Local Figure Runs
+
+These are the runs that usually do not belong on GitHub-hosted runners. Use
+them locally after the large summary sweeps identify representative parameter
+points.
+
+### Local Snapshots
+
+```bash
+python3 batch_runner.py \
+  --output-root results/local_snapshots \
+  --methods dqn_local dqn_vonn dqn_history \
+  --r-values 3.6 4.0 4.4 \
+  --seeds 2026 \
+  --grid-size 100 \
+  --iterations 100000 \
+  --history-len 3 \
+  --tail-length 5000 \
+  --save-frames-interval 1000 \
+  --update-prob 1.0 \
+  --workers 2
+```
+
+### Local Curves
+
+```bash
+python3 batch_runner.py \
+  --output-root results/local_curves \
+  --methods fermi tabular_q dqn_self dqn_local dqn_vonn dqn_wide dqn_history \
+  --r-values 3.6 4.0 4.4 \
+  --seeds 2026 \
+  --grid-size 100 \
+  --iterations 100000 \
+  --history-len 3 \
+  --tail-length 5000 \
+  --save-frames-interval 0 \
+  --update-prob 1.0 \
+  --workers 2
+```

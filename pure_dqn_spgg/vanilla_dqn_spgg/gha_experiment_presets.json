@@ -14,14 +14,15 @@
     "epsilon": "0.2",
     "epsilon_decay": "0.99",
     "epsilon_min": "0.01",
-    "workers_per_runner": "1"
+    "workers_per_runner": "1",
+    "threads_per_worker": "1"
   },
   "submission_main": {
-    "description": "Main paper-quality sweep used for phase transition analysis.",
+    "description": "Main paper-quality sweep optimized for GitHub-hosted runners with smaller shards.",
     "methods": "fermi tabular_q dqn_self dqn_local dqn_vonn dqn_wide dqn_history",
     "r_values": "2.0 2.5 3.0 3.2 3.4 3.6 3.8 4.0 4.2 4.4 4.6 5.0",
     "seeds": "2026 2027 2028 2029 2030 2031 2032 2033 2034 2035",
-    "shards": "12",
+    "shards": "96",
     "grid_size": "100",
     "iterations": "100000",
     "tail_length": "5000",
@@ -31,14 +32,15 @@
     "epsilon": "0.5",
     "epsilon_decay": "0.9995",
     "epsilon_min": "0.0",
-    "workers_per_runner": "1"
+    "workers_per_runner": "2",
+    "threads_per_worker": "1"
   },
   "submission_structure": {
-    "description": "Structure ablation comparing density, topology, range, and memory.",
+    "description": "Structure ablation optimized for GitHub-hosted runners with smaller shards.",
     "methods": "dqn_self dqn_local dqn_vonn dqn_vonn_full dqn_wide dqn_history",
     "r_values": "3.2 3.4 3.6 3.8 4.0 4.2 4.4",
     "seeds": "2026 2027 2028 2029 2030 2031 2032 2033 2034 2035",
-    "shards": "12",
+    "shards": "48",
     "grid_size": "100",
     "iterations": "100000",
     "tail_length": "5000",
@@ -48,14 +50,15 @@
     "epsilon": "0.5",
     "epsilon_decay": "0.9995",
     "epsilon_min": "0.0",
-    "workers_per_runner": "1"
+    "workers_per_runner": "2",
+    "threads_per_worker": "1"
   },
   "submission_robustness_sync": {
-    "description": "Robustness sweep under synchronous updates.",
+    "description": "Robustness sweep under synchronous updates with smaller shards.",
     "methods": "dqn_self dqn_local dqn_vonn dqn_wide dqn_history",
     "r_values": "3.4 3.6 4.0 4.4",
     "seeds": "2026 2027 2028 2029 2030 2031 2032 2033 2034 2035 2036 2037 2038 2039 2040 2041 2042 2043 2044 2045",
-    "shards": "16",
+    "shards": "48",
     "grid_size": "100",
     "iterations": "100000",
     "tail_length": "5000",
@@ -65,14 +68,15 @@
     "epsilon": "0.5",
     "epsilon_decay": "0.9995",
     "epsilon_min": "0.0",
-    "workers_per_runner": "1"
+    "workers_per_runner": "2",
+    "threads_per_worker": "1"
   },
   "submission_robustness_async": {
-    "description": "Robustness sweep under asynchronous updates.",
+    "description": "Robustness sweep under asynchronous updates with smaller shards.",
     "methods": "dqn_self dqn_local dqn_vonn dqn_wide dqn_history",
     "r_values": "3.4 3.6 4.0 4.4",
     "seeds": "2026 2027 2028 2029 2030 2031 2032 2033 2034 2035 2036 2037 2038 2039 2040 2041 2042 2043 2044 2045",
-    "shards": "16",
+    "shards": "48",
     "grid_size": "100",
     "iterations": "100000",
     "tail_length": "5000",
@@ -82,6 +86,7 @@
     "epsilon": "0.5",
     "epsilon_decay": "0.9995",
     "epsilon_min": "0.0",
-    "workers_per_runner": "1"
+    "workers_per_runner": "2",
+    "threads_per_worker": "1"
   }
 }

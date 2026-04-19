@@ -3,11 +3,9 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 from multiprocessing import Pool, cpu_count
 from pathlib import Path
-
-from batch_runner import _run_single
-
 
 SUMMARY_FIELDS = [
     "method",
@@ -48,13 +46,40 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--epsilon-decay", type=float, default=0.9995)
     p.add_argument("--epsilon-min", type=float, default=0.0)
     p.add_argument("--workers", type=int, default=1)
+    p.add_argument("--threads-per-worker", type=int, default=1)
     p.add_argument("--enable-adaptive-stop", action="store_true")
     p.add_argument("--save-model", action="store_true")
     return p.parse_args()
 
 
+def _configure_threading(threads_per_worker: int) -> None:
+    n = max(1, int(threads_per_worker))
+    for var in (
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "VECLIB_MAXIMUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+        "BLIS_NUM_THREADS",
+    ):
+        os.environ[var] = str(n)
+
+    try:
+        import torch
+
+        torch.set_num_threads(n)
+        if hasattr(torch, "set_num_interop_threads"):
+            torch.set_num_interop_threads(1)
+    except Exception:
+        pass
+
+
 def main() -> None:
     args = parse_args()
+    _configure_threading(args.threads_per_worker)
+
+    from batch_runner import _run_single
+
     shard_root = Path(args.output_root)
     shard_root.mkdir(parents=True, exist_ok=True)
 
@@ -74,6 +99,7 @@ def main() -> None:
         "epsilon_min": args.epsilon_min,
         "adaptive_stop": args.enable_adaptive_stop,
         "save_model": args.save_model,
+        "threads_per_worker": args.threads_per_worker,
     }
     runner_jobs = [{**common, **job} for job in jobs]
 
