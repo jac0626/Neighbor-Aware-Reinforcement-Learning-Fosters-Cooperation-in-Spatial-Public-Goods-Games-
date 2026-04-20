@@ -6,6 +6,12 @@ question:
 How do spatial range, directional structure, and temporal depth of agent state
 perception affect cooperation in the spatial public goods game?
 
+For the full submission bundle set, see:
+
+- `paper/csf_manuscript/EXPERIMENT_CHECKLIST.md`
+- `gha_paper_experiment_plan.json`
+- `.github/workflows/paper-full-experiments.yml`
+
 ## Main Sweep
 
 Use this as the primary phase-transition experiment in the manuscript.

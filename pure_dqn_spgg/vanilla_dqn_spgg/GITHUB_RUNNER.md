@@ -4,6 +4,7 @@ This project now includes a GitHub Actions workflow for large experiment
 replication on GitHub-hosted runners:
 
 - Workflow: `.github/workflows/spgg-github-runner.yml`
+- Full paper workflow: `.github/workflows/paper-full-experiments.yml`
 - Experiment scripts:
   - `gha_resolve_preset.py`
   - `gha_build_matrix.py`
@@ -64,6 +65,36 @@ by the preset configuration from `gha_experiment_presets.json`.
 - `submission_robustness_sync`: multi-seed robustness under synchronous updates
 - `submission_robustness_async`: multi-seed robustness under asynchronous updates
 - `smoke`: quick CI sanity check
+
+## Full Paper Workflow
+
+For a submission-oriented end-to-end run, use the dedicated workflow:
+
+- `.github/workflows/paper-full-experiments.yml`
+
+It reads:
+
+- `gha_paper_experiment_plan.json`
+
+Available profiles:
+
+- `core`: minimum paper-grade bundle set
+- `full`: stronger submission bundle set including structure ablation, finite-size robustness, and async spot checks
+
+The aggregate artifact contains one merged subdirectory per bundle, for example:
+
+```text
+pure_dqn_spgg/vanilla_dqn_spgg/results/github_actions/<run_name>/aggregate/main_unified/
+pure_dqn_spgg/vanilla_dqn_spgg/results/github_actions/<run_name>/aggregate/transition_multistability/
+pure_dqn_spgg/vanilla_dqn_spgg/results/github_actions/<run_name>/aggregate/history_h1/
+...
+```
+
+Each bundle directory includes:
+
+- `summary.csv`
+- `merged_manifest.json`
+- `phase_diagram.png` when the bundle spans multiple methods and multiple `r` values
 
 For `submission_main`, the preset expands to:
 

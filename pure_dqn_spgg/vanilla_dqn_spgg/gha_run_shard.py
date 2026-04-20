@@ -36,6 +36,7 @@ def _parse_jobs(raw: str) -> list[dict[str, object]]:
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Run one GitHub Actions shard of SPGG experiments")
+    p.add_argument("--bundle-name", default="", help="Optional logical bundle name for the shard")
     p.add_argument("--jobs-json", required=True, help="Compact JSON list of explicit {method, r, seed} jobs")
     p.add_argument("--output-root", required=True, help="Directory to write shard outputs into")
     p.add_argument("--iterations", type=int, required=True)
@@ -125,6 +126,7 @@ def main() -> None:
         writer.writerows(results)
 
     manifest = {
+        "bundle": args.bundle_name,
         "jobs": jobs,
         "common": common,
         "n_jobs": len(jobs),

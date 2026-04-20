@@ -1,0 +1,194 @@
+name: SPGG Paper Full Experiments
+
+on:
+  workflow_dispatch:
+    inputs:
+      plan_profile:
+        description: Which paper experiment plan profile to run
+        required: true
+        default: full
+        type: choice
+        options:
+          - core
+          - full
+      experiment_dir:
+        description: Experiment directory relative to repo root
+        required: true
+        default: pure_dqn_spgg/vanilla_dqn_spgg
+        type: string
+      plan_path:
+        description: Paper experiment plan JSON relative to repo root
+        required: true
+        default: pure_dqn_spgg/vanilla_dqn_spgg/gha_paper_experiment_plan.json
+        type: string
+      output_name:
+        description: Prefix for results and artifacts
+        required: true
+        default: paper-full
+        type: string
+      python_version:
+        description: Python version for the runner
+        required: true
+        default: "3.11"
+        type: string
+
+concurrency:
+  group: spgg-paper-full-${{ github.ref }}-${{ inputs.output_name }}-${{ inputs.plan_profile }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      run_name: ${{ steps.meta.outputs.run_name }}
+      experiment_dir: ${{ steps.meta.outputs.experiment_dir }}
+      python_version: ${{ steps.meta.outputs.python_version }}
+      plan_profile: ${{ steps.meta.outputs.plan_profile }}
+      plan_path: ${{ steps.meta.outputs.plan_path }}
+      bundle_count: ${{ steps.matrix.outputs.bundle_count }}
+      shard_count: ${{ steps.matrix.outputs.shard_count }}
+      job_count: ${{ steps.matrix.outputs.job_count }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        shell: bash
+        run: |
+          echo "run_name=${{ inputs.output_name }}-run${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          echo "experiment_dir=${{ inputs.experiment_dir }}" >> "$GITHUB_OUTPUT"
+          echo "python_version=${{ inputs.python_version }}" >> "$GITHUB_OUTPUT"
+          echo "plan_profile=${{ inputs.plan_profile }}" >> "$GITHUB_OUTPUT"
+          echo "plan_path=${{ inputs.plan_path }}" >> "$GITHUB_OUTPUT"
+
+      - id: matrix
+        working-directory: ${{ inputs.experiment_dir }}
+        shell: bash
+        run: |
+          python3 gha_build_bundle_matrix.py \
+            --plan "${{ github.workspace }}/${{ inputs.plan_path }}" \
+            --profile "${{ inputs.plan_profile }}" \
+            --github-output "$GITHUB_OUTPUT"
+
+  run-shard:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    defaults:
+      run:
+        working-directory: ${{ needs.prepare.outputs.experiment_dir }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ needs.prepare.outputs.python_version }}
+          cache: pip
+          cache-dependency-path: ${{ needs.prepare.outputs.experiment_dir }}/requirements-github-actions.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-github-actions.txt
+
+      - name: Run shard
+        env:
+          JOBS_JSON: ${{ matrix.jobs_json }}
+          SHARD_ROOT: results/github_actions/${{ needs.prepare.outputs.run_name }}/${{ matrix.bundle_name }}/${{ matrix.shard_name }}
+          OMP_NUM_THREADS: ${{ matrix.threads_per_worker }}
+          OPENBLAS_NUM_THREADS: ${{ matrix.threads_per_worker }}
+          MKL_NUM_THREADS: ${{ matrix.threads_per_worker }}
+          VECLIB_MAXIMUM_THREADS: ${{ matrix.threads_per_worker }}
+          NUMEXPR_NUM_THREADS: ${{ matrix.threads_per_worker }}
+          BLIS_NUM_THREADS: ${{ matrix.threads_per_worker }}
+        shell: bash
+        run: |
+          extra_args=()
+          if [ "${{ matrix.adaptive_stop }}" = "true" ]; then
+            extra_args+=("--enable-adaptive-stop")
+          fi
+          if [ "${{ matrix.save_models }}" = "true" ]; then
+            extra_args+=("--save-model")
+          fi
+
+          python gha_run_shard.py \
+            --bundle-name "${{ matrix.bundle_name }}" \
+            --jobs-json "$JOBS_JSON" \
+            --output-root "$SHARD_ROOT" \
+            --iterations "${{ matrix.iterations }}" \
+            --grid-size "${{ matrix.grid_size }}" \
+            --save-frames-interval "${{ matrix.save_frames_interval }}" \
+            --tail-length "${{ matrix.tail_length }}" \
+            --history-len "${{ matrix.history_len }}" \
+            --update-prob "${{ matrix.update_prob }}" \
+            --epsilon "${{ matrix.epsilon }}" \
+            --epsilon-decay "${{ matrix.epsilon_decay }}" \
+            --epsilon-min "${{ matrix.epsilon_min }}" \
+            --dqn-init-mode "${{ matrix.dqn_init_mode }}" \
+            --greedy-tie-break "${{ matrix.greedy_tie_break }}" \
+            --workers "${{ matrix.workers_per_runner }}" \
+            --threads-per-worker "${{ matrix.threads_per_worker }}" \
+            "${extra_args[@]}"
+
+      - name: Upload shard summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: spgg-paper-summary-${{ needs.prepare.outputs.run_name }}-${{ matrix.bundle_name }}-${{ matrix.shard_name }}
+          retention-days: 90
+          path: |
+            ${{ needs.prepare.outputs.experiment_dir }}/results/github_actions/${{ needs.prepare.outputs.run_name }}/${{ matrix.bundle_name }}/${{ matrix.shard_name }}/summary.csv
+            ${{ needs.prepare.outputs.experiment_dir }}/results/github_actions/${{ needs.prepare.outputs.run_name }}/${{ matrix.bundle_name }}/${{ matrix.shard_name }}/shard_manifest.json
+
+      - name: Upload shard raw results
+        if: matrix.upload_raw_results == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: spgg-paper-raw-${{ needs.prepare.outputs.run_name }}-${{ matrix.bundle_name }}-${{ matrix.shard_name }}
+          retention-days: 30
+          path: ${{ needs.prepare.outputs.experiment_dir }}/results/github_actions/${{ needs.prepare.outputs.run_name }}/${{ matrix.bundle_name }}/${{ matrix.shard_name }}/runs
+
+  aggregate:
+    needs:
+      - prepare
+      - run-shard
+    runs-on: ubuntu-latest
+    if: ${{ always() && needs.prepare.result == 'success' }}
+    defaults:
+      run:
+        working-directory: ${{ needs.prepare.outputs.experiment_dir }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ needs.prepare.outputs.python_version }}
+          cache: pip
+          cache-dependency-path: ${{ needs.prepare.outputs.experiment_dir }}/requirements-github-actions.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-github-actions.txt
+
+      - name: Download shard summaries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: spgg-paper-summary-${{ needs.prepare.outputs.run_name }}-*
+          path: ${{ github.workspace }}/downloaded-paper-shards
+          merge-multiple: false
+
+      - name: Merge bundle summaries
+        run: |
+          python gha_merge_bundle_shards.py \
+            --input-dir "${{ github.workspace }}/downloaded-paper-shards" \
+            --output-dir "results/github_actions/${{ needs.prepare.outputs.run_name }}/aggregate"
+
+      - name: Upload aggregate artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spgg-paper-aggregate-${{ needs.prepare.outputs.run_name }}
+          retention-days: 90
+          path: ${{ needs.prepare.outputs.experiment_dir }}/results/github_actions/${{ needs.prepare.outputs.run_name }}/aggregate

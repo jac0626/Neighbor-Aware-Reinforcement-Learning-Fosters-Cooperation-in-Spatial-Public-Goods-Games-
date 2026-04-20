@@ -11,6 +11,8 @@ from plot_phase_diagram import plot_phase_diagram
 SUMMARY_FIELDS = [
     "method",
     "state_mode",
+    "dqn_init_mode",
+    "greedy_tie_break",
     "r",
     "seed",
     "final_coop_ratio",
