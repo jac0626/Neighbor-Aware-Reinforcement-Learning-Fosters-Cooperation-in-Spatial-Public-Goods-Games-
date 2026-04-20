@@ -74,6 +74,8 @@ For `submission_main`, the preset expands to:
 - `grid_size`: `100`
 - `iterations`: `100000`
 - `tail_length`: `5000`
+- `dqn_init_mode`: `zero_last`
+- `greedy_tie_break`: `random`
 - `workers_per_runner`: `2`
 - `threads_per_worker`: `1`
 - `save_frames_interval`: `0`
@@ -95,6 +97,7 @@ Instead:
 2. keep `threads_per_worker=1`
 3. keep `save_frames_interval=0`
 4. keep `save_models=false` unless checkpoints are necessary
+5. keep `dqn_init_mode=zero_last` and `greedy_tie_break=random` unless you are reproducing legacy runs
 
 ## Why `save_models=false`
 
@@ -110,8 +113,9 @@ checkpoint-free shard runs unless you explicitly enable model saving.
 4. Select `experiment_preset`.
 5. If needed, switch to `custom` and edit the raw parameter fields.
 6. For custom runs, prefer `workers_per_runner=2` and `threads_per_worker=1` on GitHub-hosted Linux runners.
-7. Keep snapshot-heavy figure generation local unless the underlying parameter scan itself is too large.
-8. Download the final `spgg-aggregate-*` artifact after the workflow completes.
+7. For DQN sweeps, prefer `dqn_init_mode=zero_last` and `greedy_tie_break=random` to avoid seed-specific initial action bias.
+8. Keep snapshot-heavy figure generation local unless the underlying parameter scan itself is too large.
+9. Download the final `spgg-aggregate-*` artifact after the workflow completes.
 
 ## Keep Local
 

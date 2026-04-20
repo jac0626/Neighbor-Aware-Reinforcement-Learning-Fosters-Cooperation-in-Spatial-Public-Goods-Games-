@@ -79,6 +79,8 @@ def _run_single(args: dict) -> dict:
                 epsilon=args.get("epsilon", 0.5),
                 epsilon_decay=args.get("epsilon_decay", 0.9995),
                 epsilon_min=args.get("epsilon_min", 0.0),
+                dqn_init_mode=args.get("dqn_init_mode", "zero_last"),
+                greedy_tie_break=args.get("greedy_tie_break", "random"),
                 update_prob=update_prob,
                 save_model=args.get("save_model", True),
                 deterministic_cpu=True,
@@ -104,6 +106,8 @@ def _run_single(args: dict) -> dict:
         result = {
             "method": method,
             "state_mode": DQN_METHOD_TO_STATE_MODE.get(method, method),
+            "dqn_init_mode": cfg.dqn_init_mode if method in DQN_METHOD_TO_STATE_MODE else "",
+            "greedy_tie_break": cfg.greedy_tie_break if method in DQN_METHOD_TO_STATE_MODE else "",
             "r": r,
             "seed": seed,
             "final_coop_ratio": summary["final_coop_ratio"],
@@ -126,6 +130,8 @@ def _run_single(args: dict) -> dict:
         return {
             "method": method,
             "state_mode": DQN_METHOD_TO_STATE_MODE.get(method, method),
+            "dqn_init_mode": args.get("dqn_init_mode", "") if method in DQN_METHOD_TO_STATE_MODE else "",
+            "greedy_tie_break": args.get("greedy_tie_break", "") if method in DQN_METHOD_TO_STATE_MODE else "",
             "r": r,
             "seed": seed,
             "final_coop_ratio": float("nan"),
@@ -170,6 +176,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--epsilon", type=float, default=0.5)
     p.add_argument("--epsilon-decay", type=float, default=0.9995)
     p.add_argument("--epsilon-min", type=float, default=0.0)
+    p.add_argument("--dqn-init-mode", type=str, default="zero_last")
+    p.add_argument("--greedy-tie-break", type=str, default="random")
     p.add_argument("--enable-adaptive-stop", action="store_true")
     p.add_argument("--no-save-model", action="store_true")
     return p.parse_args()
@@ -200,6 +208,8 @@ def main():
                     "epsilon": args.epsilon,
                     "epsilon_decay": args.epsilon_decay,
                     "epsilon_min": args.epsilon_min,
+                    "dqn_init_mode": args.dqn_init_mode,
+                    "greedy_tie_break": args.greedy_tie_break,
                     "adaptive_stop": args.enable_adaptive_stop,
                     "save_model": not args.no_save_model,
                 })
@@ -223,6 +233,8 @@ def main():
     fieldnames = [
         "method",
         "state_mode",
+        "dqn_init_mode",
+        "greedy_tie_break",
         "r",
         "seed",
         "final_coop_ratio",
@@ -256,6 +268,8 @@ def main():
                 "epsilon": args.epsilon,
                 "epsilon_decay": args.epsilon_decay,
                 "epsilon_min": args.epsilon_min,
+                "dqn_init_mode": args.dqn_init_mode,
+                "greedy_tie_break": args.greedy_tie_break,
                 "adaptive_stop": args.enable_adaptive_stop,
                 "save_model": not args.no_save_model,
             },

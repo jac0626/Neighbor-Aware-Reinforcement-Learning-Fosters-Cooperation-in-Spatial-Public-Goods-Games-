@@ -95,6 +95,22 @@ on:
         required: true
         default: "0.0"
         type: string
+      dqn_init_mode:
+        description: DQN parameter initialization mode
+        required: true
+        default: zero_last
+        type: choice
+        options:
+          - zero_last
+          - torch_default
+      greedy_tie_break:
+        description: How greedy DQN policy breaks equal-Q ties
+        required: true
+        default: random
+        type: choice
+        options:
+          - random
+          - first
       workers_per_runner:
         description: Local worker count inside each shard
         required: true
@@ -156,6 +172,8 @@ jobs:
       epsilon: ${{ steps.resolve.outputs.epsilon }}
       epsilon_decay: ${{ steps.resolve.outputs.epsilon_decay }}
       epsilon_min: ${{ steps.resolve.outputs.epsilon_min }}
+      dqn_init_mode: ${{ steps.resolve.outputs.dqn_init_mode }}
+      greedy_tie_break: ${{ steps.resolve.outputs.greedy_tie_break }}
       workers_per_runner: ${{ steps.resolve.outputs.workers_per_runner }}
       threads_per_worker: ${{ steps.resolve.outputs.threads_per_worker }}
       adaptive_stop: ${{ steps.meta.outputs.adaptive_stop }}
@@ -193,6 +211,8 @@ jobs:
             --epsilon "${{ inputs.epsilon }}" \
             --epsilon-decay "${{ inputs.epsilon_decay }}" \
             --epsilon-min "${{ inputs.epsilon_min }}" \
+            --dqn-init-mode "${{ inputs.dqn_init_mode }}" \
+            --greedy-tie-break "${{ inputs.greedy_tie_break }}" \
             --workers-per-runner "${{ inputs.workers_per_runner }}" \
             --threads-per-worker "${{ inputs.threads_per_worker }}" \
             --github-output "$GITHUB_OUTPUT"
@@ -264,6 +284,8 @@ jobs:
             --epsilon "${{ needs.prepare.outputs.epsilon }}" \
             --epsilon-decay "${{ needs.prepare.outputs.epsilon_decay }}" \
             --epsilon-min "${{ needs.prepare.outputs.epsilon_min }}" \
+            --dqn-init-mode "${{ needs.prepare.outputs.dqn_init_mode }}" \
+            --greedy-tie-break "${{ needs.prepare.outputs.greedy_tie_break }}" \
             --workers "${{ needs.prepare.outputs.workers_per_runner }}" \
             --threads-per-worker "${{ needs.prepare.outputs.threads_per_worker }}" \
             "${extra_args[@]}"

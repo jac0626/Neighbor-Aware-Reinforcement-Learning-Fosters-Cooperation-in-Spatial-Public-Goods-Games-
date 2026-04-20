@@ -10,6 +10,8 @@ from pathlib import Path
 SUMMARY_FIELDS = [
     "method",
     "state_mode",
+    "dqn_init_mode",
+    "greedy_tie_break",
     "r",
     "seed",
     "final_coop_ratio",
@@ -45,6 +47,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--epsilon", type=float, default=0.5)
     p.add_argument("--epsilon-decay", type=float, default=0.9995)
     p.add_argument("--epsilon-min", type=float, default=0.0)
+    p.add_argument("--dqn-init-mode", type=str, default="zero_last")
+    p.add_argument("--greedy-tie-break", type=str, default="random")
     p.add_argument("--workers", type=int, default=1)
     p.add_argument("--threads-per-worker", type=int, default=1)
     p.add_argument("--enable-adaptive-stop", action="store_true")
@@ -97,6 +101,8 @@ def main() -> None:
         "epsilon": args.epsilon,
         "epsilon_decay": args.epsilon_decay,
         "epsilon_min": args.epsilon_min,
+        "dqn_init_mode": args.dqn_init_mode,
+        "greedy_tie_break": args.greedy_tie_break,
         "adaptive_stop": args.enable_adaptive_stop,
         "save_model": args.save_model,
         "threads_per_worker": args.threads_per_worker,

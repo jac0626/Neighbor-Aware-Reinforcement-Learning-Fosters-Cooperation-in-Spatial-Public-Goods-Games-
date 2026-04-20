@@ -19,6 +19,8 @@ FIELDS = [
     "epsilon",
     "epsilon_decay",
     "epsilon_min",
+    "dqn_init_mode",
+    "greedy_tie_break",
     "workers_per_runner",
     "threads_per_worker",
 ]
@@ -46,6 +48,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--epsilon", required=True)
     p.add_argument("--epsilon-decay", required=True)
     p.add_argument("--epsilon-min", required=True)
+    p.add_argument("--dqn-init-mode", required=True)
+    p.add_argument("--greedy-tie-break", required=True)
     p.add_argument("--workers-per-runner", required=True)
     p.add_argument("--threads-per-worker", required=True)
     p.add_argument("--github-output", type=Path, help="Optional path to $GITHUB_OUTPUT")
@@ -67,6 +71,8 @@ def _custom_values(args: argparse.Namespace) -> dict[str, str]:
         "epsilon": args.epsilon,
         "epsilon_decay": args.epsilon_decay,
         "epsilon_min": args.epsilon_min,
+        "dqn_init_mode": args.dqn_init_mode,
+        "greedy_tie_break": args.greedy_tie_break,
         "workers_per_runner": args.workers_per_runner,
         "threads_per_worker": args.threads_per_worker,
     }

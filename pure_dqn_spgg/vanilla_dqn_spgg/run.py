@@ -22,6 +22,8 @@ from spgg_utils import normalize_payoff_fixed, overlap5, overlap_wide, von_neuma
 
 
 SUPPORTED_STATE_MODES = ("self", "local", "vonn", "vonn_full", "wide", "history")
+SUPPORTED_DQN_INIT_MODES = ("torch_default", "zero_last")
+SUPPORTED_GREEDY_TIE_BREAKS = ("first", "random")
 
 
 @dataclass(slots=True)
@@ -41,6 +43,8 @@ class VanillaDQNSPGGConfig:
     gamma: float = 0.9
     dqn_lr: float = 1e-4
     hidden_dim: int = 64
+    dqn_init_mode: str = "zero_last"
+    greedy_tie_break: str = "random"
 
     # Replay and target network
     buffer_size: int = 2000000
@@ -113,6 +117,10 @@ class VanillaDQNSPGGConfig:
             raise ValueError(f"Unsupported state_mode: {self.state_mode}")
         if self.history_len <= 0:
             raise ValueError("history_len must be > 0")
+        if self.dqn_init_mode not in SUPPORTED_DQN_INIT_MODES:
+            raise ValueError(f"Unsupported dqn_init_mode: {self.dqn_init_mode}")
+        if self.greedy_tie_break not in SUPPORTED_GREEDY_TIE_BREAKS:
+            raise ValueError(f"Unsupported greedy_tie_break: {self.greedy_tie_break}")
 
     def state_dim(self) -> int:
         if self.state_mode == "self":
@@ -132,6 +140,8 @@ class VanillaDQNSPGGConfig:
 
 def run_dir_name(cfg: VanillaDQNSPGGConfig) -> str:
     tags = ["vanilla", "p1", "dqn", "tgthard", "basic", f"st-{cfg.state_mode}"]
+    tags.append(f"init-{cfg.dqn_init_mode}")
+    tags.append(f"tie-{cfg.greedy_tie_break}")
     if cfg.deterministic_cpu:
         tags.append("dcpu")
     if cfg.adaptive_stop:
@@ -231,10 +241,22 @@ class SharedDQN:
         self.gamma = float(cfg.gamma)
         self.state_dim = int(state_dim)
         self.online_net = DQNNet(self.state_dim, cfg.hidden_dim, cfg.action_dim).to(self.device)
+        self._apply_initialization(self.online_net, cfg.dqn_init_mode)
         self.target_net = DQNNet(self.state_dim, cfg.hidden_dim, cfg.action_dim).to(self.device)
         self.target_net.load_state_dict(self.online_net.state_dict())
         self.target_net.eval()
         self.optimizer = torch.optim.Adam(self.online_net.parameters(), lr=cfg.dqn_lr)
+
+    @staticmethod
+    def _apply_initialization(net: DQNNet, mode: str) -> None:
+        if mode == "torch_default":
+            return
+        if mode == "zero_last":
+            final_layer = net.net[2]
+            nn.init.zeros_(final_layer.weight)
+            nn.init.zeros_(final_layer.bias)
+            return
+        raise ValueError(f"Unsupported dqn_init_mode: {mode}")
 
     @torch.no_grad()
     def predict(self, states: np.ndarray) -> np.ndarray:
@@ -358,7 +380,7 @@ class VanillaDQNSPGGEngine:
         # Calculate greedy actions for everyone
         flat_state = state.reshape(-1, self.state_dim)
         q_values = self.dqn.predict(flat_state).reshape(self.cfg.L, self.cfg.L, self.cfg.action_dim)
-        greedy_actions = np.argmax(q_values, axis=2).astype(np.int8)
+        greedy_actions = self._greedy_actions(q_values)
         
         # Calculate random exploration actions
         explore = self.rng.random((self.cfg.L, self.cfg.L)) < epsilon
@@ -369,6 +391,15 @@ class VanillaDQNSPGGEngine:
         
         # Only apply new actions where mask is true, otherwise stay put
         return np.where(update_mask, new_proposed, current_actions).astype(np.int8)
+
+    def _greedy_actions(self, q_values: np.ndarray) -> np.ndarray:
+        if self.cfg.greedy_tie_break == "first":
+            return np.argmax(q_values, axis=2).astype(np.int8)
+
+        max_q = np.max(q_values, axis=2, keepdims=True)
+        tie_mask = np.isclose(q_values, max_q, rtol=1e-7, atol=1e-8)
+        random_scores = np.where(tie_mask, self.rng.random(q_values.shape), -1.0)
+        return np.argmax(random_scores, axis=2).astype(np.int8)
 
     def run(self, output_dir: Path) -> dict[str, float | int]:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -501,6 +532,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--gamma", type=float, default=0.9)
     p.add_argument("--dqn-lr", type=float, default=1e-4) # Reduced further to damp oscillation
     p.add_argument("--hidden-dim", type=int, default=64)
+    p.add_argument("--dqn-init-mode", type=str, default="zero_last", choices=list(SUPPORTED_DQN_INIT_MODES))
+    p.add_argument("--greedy-tie-break", type=str, default="random", choices=list(SUPPORTED_GREEDY_TIE_BREAKS))
     p.add_argument("--buffer-size", type=int, default=2000000)
     p.add_argument("--batch-size", type=int, default=256)
     p.add_argument("--warmup-replay-size", type=int, default=200000)
@@ -542,6 +575,8 @@ def main() -> None:
         gamma=args.gamma,
         dqn_lr=args.dqn_lr,
         hidden_dim=args.hidden_dim,
+        dqn_init_mode=args.dqn_init_mode,
+        greedy_tie_break=args.greedy_tie_break,
         buffer_size=args.buffer_size,
         batch_size=args.batch_size,
         warmup_replay_size=args.warmup_replay_size,

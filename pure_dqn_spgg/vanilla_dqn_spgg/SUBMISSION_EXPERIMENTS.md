@@ -19,6 +19,8 @@ python3 batch_runner.py \
   --grid-size 100 \
   --iterations 100000 \
   --history-len 3 \
+  --dqn-init-mode zero_last \
+  --greedy-tie-break random \
   --tail-length 5000 \
   --update-prob 1.0 \
   --workers 4
@@ -44,6 +46,8 @@ python3 batch_runner.py \
   --grid-size 100 \
   --iterations 100000 \
   --history-len 3 \
+  --dqn-init-mode zero_last \
+  --greedy-tie-break random \
   --tail-length 5000 \
   --update-prob 1.0 \
   --workers 4
@@ -71,6 +75,8 @@ python3 batch_runner.py \
   --grid-size 100 \
   --iterations 100000 \
   --history-len 3 \
+  --dqn-init-mode zero_last \
+  --greedy-tie-break random \
   --tail-length 5000 \
   --update-prob 1.0 \
   --workers 4
@@ -85,6 +91,8 @@ python3 batch_runner.py \
   --grid-size 100 \
   --iterations 100000 \
   --history-len 3 \
+  --dqn-init-mode zero_last \
+  --greedy-tie-break random \
   --tail-length 5000 \
   --update-prob 0.5 \
   --workers 4
@@ -114,6 +122,8 @@ python3 batch_runner.py \
   --grid-size 100 \
   --iterations 100000 \
   --history-len 3 \
+  --dqn-init-mode zero_last \
+  --greedy-tie-break random \
   --tail-length 5000 \
   --save-frames-interval 1000 \
   --update-prob 1.0 \
@@ -131,6 +141,8 @@ python3 batch_runner.py \
   --grid-size 100 \
   --iterations 100000 \
   --history-len 3 \
+  --dqn-init-mode zero_last \
+  --greedy-tie-break random \
   --tail-length 5000 \
   --save-frames-interval 0 \
   --update-prob 1.0 \
