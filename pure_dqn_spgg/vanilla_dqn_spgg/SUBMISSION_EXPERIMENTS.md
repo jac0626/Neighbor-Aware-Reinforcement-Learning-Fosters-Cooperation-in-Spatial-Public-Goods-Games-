@@ -12,6 +12,10 @@ For the full submission bundle set, see:
 - `gha_paper_experiment_plan.json`
 - `.github/workflows/paper-full-experiments.yml`
 
+The default GitHub-hosted runner parallelism for the paper workflow is:
+
+- `4 workers x 1 thread`
+
 ## Main Sweep
 
 Use this as the primary phase-transition experiment in the manuscript.

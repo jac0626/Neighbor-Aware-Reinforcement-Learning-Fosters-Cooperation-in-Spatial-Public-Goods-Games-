@@ -107,7 +107,7 @@ For `submission_main`, the preset expands to:
 - `tail_length`: `5000`
 - `dqn_init_mode`: `zero_last`
 - `greedy_tie_break`: `random`
-- `workers_per_runner`: `2`
+- `workers_per_runner`: `4`
 - `threads_per_worker`: `1`
 - `save_frames_interval`: `0`
 - `save_models`: `false`
@@ -121,7 +121,8 @@ matrix jobs are capped at 256 jobs per workflow run. The current presets stay
 within that matrix limit while pushing the per-shard job count down far enough
 that long DQN sweeps are less likely to be cancelled.
 
-If one preset still times out, do not increase `workers_per_runner` first.
+The paper workflow defaults assume a 4-core GitHub-hosted runner and fill it with `4 x 1` concurrency.
+If one preset still times out, do not increase `workers_per_runner` beyond that first.
 Instead:
 
 1. increase `shards`
@@ -143,7 +144,7 @@ checkpoint-free shard runs unless you explicitly enable model saving.
 3. Run `SPGG GitHub Runner`.
 4. Select `experiment_preset`.
 5. If needed, switch to `custom` and edit the raw parameter fields.
-6. For custom runs, prefer `workers_per_runner=2` and `threads_per_worker=1` on GitHub-hosted Linux runners.
+6. For custom runs, prefer `workers_per_runner=4` and `threads_per_worker=1` on GitHub-hosted Linux runners with 4 vCPUs.
 7. For DQN sweeps, prefer `dqn_init_mode=zero_last` and `greedy_tie_break=random` to avoid seed-specific initial action bias.
 8. Keep snapshot-heavy figure generation local unless the underlying parameter scan itself is too large.
 9. Download the final `spgg-aggregate-*` artifact after the workflow completes.
