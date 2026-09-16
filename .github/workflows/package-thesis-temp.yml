@@ -1,0 +1,40 @@
+name: Package Thesis Temp
+
+on:
+  push:
+    branches:
+      - codex/github-runner-presets
+    paths:
+      - '.github/workflows/package-thesis-temp.yml'
+      - 'thesis/**'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package current thesis source
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, zipfile
+          root = 'thesis'
+          out = '/tmp/thesis-current.zip'
+          with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
+              for dirpath, dirnames, filenames in os.walk(root):
+                  dirnames[:] = [d for d in dirnames if d != 'build']
+                  for name in filenames:
+                      path = os.path.join(dirpath, name)
+                      z.write(path, path)
+          print(out)
+          PY
+      - name: Upload thesis source
+        uses: actions/upload-artifact@v4
+        with:
+          name: thesis-current-source
+          path: /tmp/thesis-current.zip
+          if-no-files-found: error
+          retention-days: 1
