@@ -1,0 +1,13 @@
+{
+  "source_directory": "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/validation-cem-20260915",
+  "purpose": "validation/model-selection data, not final test",
+  "selected_candidate": "3001-last_generation_best",
+  "source_files": {
+    "manifest.json": "02b51e32db4c841a00d08f1fcdf1a8fed6ccf0788a411d68322f50ed4ed65be1",
+    "selection.json": "d8db05bb9a2404cbd81a0e9bb4cebf642a19b02a17405c118414ab5b64099cba",
+    "summary.csv": "c77d53d3fcd2930c60bda2622cf2004e83997644edb0e80fd334dafe8db285ec",
+    "trajectories.pdf": "cd2b03ccb21e17a8f6fdc3f0bbfc3c8369ea88bd159e737ef51e50eb85c17b31",
+    "snapshots.pdf": "bb33985fcdbdb5220a4c0f65ff3f4a36ba6a9cdabff8e146c904c866a109bc0d"
+  },
+  "exporter_sha256": "ab246cb6b9f440bcdb3d78675092f203302e3cd7586f0fa39fd09b66f40a365b"
+}

@@ -1,0 +1,68 @@
+{
+  "original_directory": "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/final-test-20260915",
+  "run": 90,
+  "config": {
+    "L": 30,
+    "r": 4.8,
+    "steps": 100000,
+    "seed": 1000,
+    "M": 2,
+    "state_mode": "reputation",
+    "method": "learned",
+    "kappa": 0.5,
+    "payoff_weight": 1.0,
+    "rho": 0.1,
+    "attack": "high_defect",
+    "alpha": 0.8,
+    "gamma": 0.9,
+    "epsilon_initial": 0.5,
+    "epsilon_min": 0.01,
+    "epsilon_decay": 0.99,
+    "record_every": 100,
+    "controller": [
+      0.8795659447628288,
+      -0.12037316518610122,
+      1.3667902571869464,
+      -0.9906534073563517,
+      2.1325414258366266,
+      1.4401042595975282,
+      -2.5497810294535537,
+      0.07760682754656736,
+      1.8170672767320166,
+      0.47321379283088616,
+      1.1923342868382174,
+      -0.578213888333164
+    ],
+    "gate_scale": 1.0
+  },
+  "archived_engine_sha256": "2b1b2967679acd29e98f0cc946e2c22d3461bb4a65d70b927b570c4faf7a183c",
+  "checks": {
+    "q": true,
+    "actions": true,
+    "bad_mask": true,
+    "trajectory": true,
+    "whole": true,
+    "tail": true
+  },
+  "exact_match": true,
+  "whole": {
+    "cooperation": 0.9838676999998476,
+    "raw_welfare_per_agent": 18.69348630000423,
+    "switch_rate": 0.018802866666658726,
+    "selected_bad_fraction": 1.5555555555555556e-07,
+    "active_selected_bad_fraction": 1.1140807552576393e-06,
+    "active_ni_fraction": 0.1396268222222205,
+    "mean_abs_ni": 0.010198702081998638,
+    "mean_gate": 0.17215666783282838
+  },
+  "tail": {
+    "cooperation": 0.9842895555555508,
+    "raw_welfare_per_agent": 18.701501555555986,
+    "switch_rate": 0.018466111111111416,
+    "selected_bad_fraction": 0.0,
+    "active_selected_bad_fraction": 0.0,
+    "active_ni_fraction": 0.1391768333333329,
+    "mean_abs_ni": 0.010148678330173522,
+    "mean_gate": 0.1717731593321925
+  }
+}

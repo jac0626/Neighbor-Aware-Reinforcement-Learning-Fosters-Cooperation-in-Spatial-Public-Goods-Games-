@@ -1,0 +1,45 @@
+\documentclass[UTF8,fontset=fandol,zihao=-4]{ctexart}
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{amsmath,booktabs}
+\usepackage[hidelinks]{hyperref}
+\linespread{1.15}
+\title{论文写作技能验证样稿}
+\author{项目：面向局部社会信息的多智能体强化学习与合作演化研究}
+\date{2026年9月15日}
+\begin{document}
+\maketitle
+\noindent\textbf{阅读说明：}下节是依据已提供的工作1论文源文件撰写的正文样例，供判断行文风格与事实准确性；尚未并入学位论文。它不是已完成的整个方法章节，也不包含新增实验结果。
+\input{validation/work1-sample}
+\clearpage
+\section{工作2实验结论检查}
+以下数值来自中期汇报，尚未用逐次运行结果核验。它们用于检查计算和论证范围，不构成实验复现。
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+方法 & 无故障合作率 & 10\%持续虚假节点\\
+\midrule
+单最佳邻居 & 0.959 & 0.138\\
+E2E-LTNA-Q & 0.773 & 0.778\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{可由汇报值计算的量。}在异常条件下，新方法与基线的均值差约为 $0.778-0.138=0.640$，即64.0个百分点；无故障时则低18.6个百分点。基线从无故障到异常条件下降82.1个百分点，新方法的汇报均值上升0.5个百分点。最后一个差值不能据此解释为异常促进合作，也不能在没有逐次数据时称为统计显著。
+
+\textbf{训练目标的解释。}若工作2沿用每人参与五组、每组合作成本为1的规则，且福利定义为所有个体真实原始收益之和，那么每组总收益为 $(r-1)n_C(g)$。每个合作者被五个组计入，因而
+\[
+ W(t)=\sum_i P_i(t)=5(r-1)N_C(t),\qquad
+ \overline P(t)=5(r-1)f_C(t).
+\]
+固定 $r>1$、相同时间窗口和权重时，两者成正比。因此，“合作率未显式写入目标”不足以证明训练目标与合作率无关。应先核对工作2的实际目标函数；若包含其他代价、非线性变换、不同参数权重或不同评估窗口，需要另外分析。本次仅对上述公式做了小网格穷举校验，未运行工作2训练。
+
+\textbf{统计与对照。}测试种子10至19提供十次运行，不能将每次运行中的900个节点或十万时间步作为独立重复。若比较采用配对设计，应保存共享的初始环境、异常节点及逐次结果；相同种子编号本身不足以说明环境随机量逐项匹配。还应区分一个固定控制器的测试波动与重新训练控制器产生的波动。
+
+\textbf{优先补充的证据。}先核验现有结果，再在相同设置下比较小固定修正强度、仅学习选择、仅学习门控及完整模型，以判断提升分别来自哪里。各方法记录相同口径的长期福利、合作率、停止步数与是否达到停止条件。达到步数上限的运行也应保留；提前停止代表满足设定判据，不等于理论收敛。最终报告需给出逐次结果以及适合该实验设计的差值区间。
+
+\section{验证范围与来源}
+三个技能的入口配置已通过本机结构校验。写作样例核对来源为 \path{work1-paper/en_main.tex} 中的模型、Q-learning及邻居影响部分。统计部分检查了汇报均值运算，并对固定公共物品博弈规则下的福利关系进行精确算术校验。这些检查展示本次工作流程；没有进行有无技能的盲评，不能据此量化写作质量提升。
+
+本次应用了 research-writing-skill、experimental-design 和 statistical-analysis。依照后两者的引用要求，在此记录工具来源：Kassis, T., Agarwal, V., He, Y., Patel, D., \& Brueckner, A. M. (2026). \textit{Scientific Agent Skills: A Library of Procedural Knowledge for Research Agents}. \href{https://doi.org/10.48550/arXiv.2609.00065}{arXiv:2609.00065}。记录已于2026年9月15日核对，当前修订日期为9月2日。
+\end{document}

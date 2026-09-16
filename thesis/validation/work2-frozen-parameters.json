@@ -1,0 +1,145 @@
+{
+  "models": [
+    {
+      "label": "3100-last_generation_best",
+      "method": "learned",
+      "kappa": 0.5,
+      "gate_scale": 1.0,
+      "family": "learned",
+      "training_path": "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/cem-semantic-20260915",
+      "controller": [
+        0.8795659447628288,
+        -0.12037316518610122,
+        1.3667902571869464,
+        -0.9906534073563517,
+        2.1325414258366266,
+        1.4401042595975282,
+        -2.5497810294535537,
+        0.07760682754656736,
+        1.8170672767320166,
+        0.47321379283088616,
+        1.1923342868382174,
+        -0.578213888333164
+      ],
+      "source_sha256": "29b0948841dd7587e754f35df211aff7c19670a5b27756cb1252b91400806d3e"
+    },
+    {
+      "label": "3202-last_generation_best",
+      "method": "learned",
+      "kappa": 0.5,
+      "gate_scale": 1.0,
+      "family": "cooperation_gate",
+      "training_path": "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/cem-cooperation-gate-20260915",
+      "controller": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        2.0,
+        1.6248507872190856,
+        -2.940219402484896,
+        6.258112848125914,
+        -0.47888115873029563,
+        -1.2657235064377224,
+        -0.42950833680832884,
+        2.579153365025027
+      ],
+      "source_sha256": "11f180c87e84287437b329425ae00049c2ab27164bcfd6912525c0800beecd0d"
+    },
+    {
+      "label": "3302-last_generation_best",
+      "method": "selection_only",
+      "kappa": 0.5,
+      "gate_scale": 0.4,
+      "family": "selection_only",
+      "training_path": "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/cem-selection-only-20260915",
+      "controller": [
+        0.4596477511464946,
+        0.10166252139591556,
+        1.9573421386201753,
+        -1.1333735571648909,
+        2.2969326727633854,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -0.40546510810816444
+      ],
+      "source_sha256": "df0ef9b505bde96e620f36f903cb51349b09b86b53b07045d9228f277248450f"
+    },
+    {
+      "label": "3401-final_mean",
+      "method": "gate_only",
+      "kappa": 0.5,
+      "gate_scale": 1.0,
+      "family": "gate_only",
+      "training_path": "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/cem-gate-only-20260915",
+      "controller": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        2.0,
+        -0.9148296822346161,
+        -0.12475892443474934,
+        -2.206453963150802,
+        -1.0082535899428138,
+        4.5107416419133095,
+        -2.4580041132403023,
+        -2.290863397630005
+      ],
+      "source_sha256": "1be5706b384a6c1c34be6a187c3b574204f2d29a85fdd539f4c082f1f66d4234"
+    },
+    {
+      "label": "iql-0",
+      "method": "iql",
+      "kappa": 0.0,
+      "gate_scale": 1.0,
+      "controller": null
+    },
+    {
+      "label": "ni_global-0.5",
+      "method": "ni_global",
+      "kappa": 0.5,
+      "gate_scale": 1.0,
+      "controller": null
+    },
+    {
+      "label": "ni_local-0.5",
+      "method": "ni_local",
+      "kappa": 0.5,
+      "gate_scale": 1.0,
+      "controller": null
+    },
+    {
+      "label": "trimmed_local-0.5",
+      "method": "trimmed_local",
+      "kappa": 0.5,
+      "gate_scale": 1.0,
+      "controller": null
+    },
+    {
+      "label": "cooperation_first-0.2",
+      "method": "cooperation_first",
+      "kappa": 0.2,
+      "gate_scale": 1.0,
+      "controller": null
+    },
+    {
+      "label": "cooperation_first-0.0277045",
+      "method": "cooperation_first",
+      "kappa": 0.027704459701337496,
+      "gate_scale": 1.0,
+      "controller": null
+    }
+  ],
+  "source_files": {
+    "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/validation-structure-20260915/manifest.json": "27e8d1cd1cb9c772f0af28c80bca879f5805936f3b0734f1ad8bd9069e9d1f80",
+    "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/validation-structure-20260915/selection.json": "ac656fcc74e1ae1985eeb30324c9142d471d6b1ec03998f1ab1e0afc865f7aa3",
+    "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/amplitude-calibration-20260915/calibration.json": "5b939cfd60d4599fa7f1925e9be78055e22a989550fb746486b447acaff98923",
+    "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/amplitude-refinement-20260915/refinement.json": "0129ba53b01c9fa91165389d35241707daf64ac9205c97ce93c50e04bcd35fa2"
+  },
+  "exporter_sha256": "11deb936254ca205915b874731431d842c9ccfe8179e68891cee8aca2355ab90"
+}

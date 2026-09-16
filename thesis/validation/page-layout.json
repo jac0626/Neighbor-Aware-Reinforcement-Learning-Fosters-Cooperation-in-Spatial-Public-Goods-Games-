@@ -1,0 +1,32 @@
+{
+  "source": "https://office.ynu.edu.cn/info/1080/1701.htm",
+  "measurement": "visible header top and footer bottom relative to A4 page edges, using PDF text bounding boxes",
+  "sample_pages": [
+    {
+      "physical_page": 16,
+      "header_top_cm": 1.6006938888888889,
+      "footer_bottom_margin_cm": 1.5000111111111105
+    },
+    {
+      "physical_page": 17,
+      "header_top_cm": 1.6006938888888889,
+      "footer_bottom_margin_cm": 1.5000111111111105
+    }
+  ],
+  "text_margins_cm": {
+    "top": 3,
+    "bottom": 2.5,
+    "left": 2.5,
+    "right": 2.5,
+    "bindingoffset": 1
+  },
+  "pdf_sha256": "659e3aeef75bc39798d5a43072264463fb64a7ed16bf9c153b133327bf5a3364",
+  "geometry_log": [
+    "* \\textwidth=426.79137pt",
+    "* \\textheight=688.5567pt",
+    "* \\oddsidemargin=27.31464pt",
+    "* \\evensidemargin=-1.1381pt",
+    "* \\headsep=26.74565pt",
+    "* \\footskip=26.17648pt"
+  ]
+}

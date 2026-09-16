@@ -1,0 +1,21 @@
+{
+  "full_fault_r4.4": {
+    "whole_mean": 0.9677406225926224,
+    "tail_mean": 0.9685220907407209,
+    "tail_sample_sd": 0.00041521161891568787,
+    "tail_switch_mean": 0.025985520370370142
+  },
+  "full_fault_r4.8": {
+    "whole_mean": 0.9839812118517025,
+    "tail_mean": 0.9844295870370318,
+    "tail_sample_sd": 0.00013546748653274084,
+    "tail_switch_mean": 0.01841495370370406
+  },
+  "fixed_rule_primary": {
+    "min_percentage_points": 4.104838148136126,
+    "max_percentage_points": 5.254996111110003,
+    "all_four_adjusted_intervals_above_zero": true
+  },
+  "source_sha256": "62f789ab6fc2dc20ff66b12a3897c575c110e666f28efa8b362d12663064b19a",
+  "scope": "Key final claims checked against all 1200 audited runs; not a substitute for full prose review."
+}

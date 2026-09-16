@@ -1,0 +1,114 @@
+{
+  "files": {
+    "chapters/03-work1.tex": {
+      "before": "249f01bc766eaa868bae2bb99e5c8eea36e11ae4ff20425286916c6bb313829f",
+      "after": "65d8a5d71ec3e3bc5d62ce2697d21115c681447844c77174040e134b0a951e81"
+    },
+    "chapters/04-work2.tex": {
+      "before": "976e2a95e247e5ebaf43047d8422b156f5f81de4d4580ce07cec9310e4ac457f",
+      "after": "a419d645a03a25881e72577a730b13aed26aadfba2d2a8bd9236837c0643bf00"
+    },
+    "chapters/05-evaluation.tex": {
+      "before": "08517d00f9e2ba41030c405451405f1132cd8b2435ee1fc5396f2f3f4910bba9",
+      "after": "c08c7abaff7c38de8846f8ecaa73c939ce4296dec908ba6479ce8d49f3b850fc"
+    },
+    "backmatter/appendix.tex": {
+      "before": "f875fce93fa8ef6268a47dc76fc20c383aacca9daaf47eb420936a9d241fc87b",
+      "after": "e5be82991de682627bbdc7d6a2d9cd084f0e87cb8ab2555a71736b565ed242bf"
+    },
+    "backmatter/development-history.tex": {
+      "before": "f0e899963b71c76f3596f55598b1577ee60059f0907452e34be2410c401045aa",
+      "after": "c5228fec9bcfc119d22dc338eb820193cdef132cbf44bf295bbec75c87dad18d"
+    },
+    "figures/work2-development/training-validation-table.tex": {
+      "before": "6ac3a450613317177797c568909bd1d23804f501709db51abb7fe1b9067745fd",
+      "after": "6664eb2c49ec35e05b4fdb5b8a7f58952a9252cf6b13d32f4b687f83c6cbcd3f"
+    },
+    "figures/work2-development/validation-table.tex": {
+      "before": "6f63d6c249e9a39bf8b3d8b07c0dbf159bc269b5c533e88e7ca4b1162356dffb",
+      "after": "1759a6654dce3a6cfaf67ceb89a78dd7986606f292eb290ead1abd209fb51678"
+    },
+    "figures/work2-frozen-parameters.tex": {
+      "before": "59922603e02a9ec32430acc06c075613a95faa4b10d94a0743d44d0925eeae34",
+      "after": "35e969275dfec0475cd4545e50ce9bd57ad1ff5caa8712622c6254e1c8a91d12"
+    },
+    "figures/work2-generalization/messages-table.tex": {
+      "before": "5633579736d7dc17eb207c2254446d58c1f44e753838aa464a037dcfef1dea8e",
+      "after": "4cd4a9b30fd63ccf664c7d6c27954bd98aaedb285a44fb926f0604b63e2eb80a"
+    },
+    "figures/work2-generalization/parameter-boundaries-table.tex": {
+      "before": "1e686f3bc1af4ae536d77793351753755336afe8308477a341433d13ac9c996f",
+      "after": "66af9d84bce98d4a721278444ce51d7d67190adcb1827240edf903b05ba2b182"
+    },
+    "figures/work2-generalization/scale-table.tex": {
+      "before": "2c66e176de1db05edf9aa5580406316454f72230f3c39a9237247d652e9b531e",
+      "after": "4dd79f434232f410bf59c6160d00ef206db520800bffa651c6657af45335adaf"
+    },
+    "figures/work2-generalization/state-table.tex": {
+      "before": "01535a31e69757a69779610445a2f317ed9206746135e8857d8ba7ce76e9407d",
+      "after": "6d331edfb2233ae795c6cf06f970918f5d71ecbf7f268040b3263599cd1bf818"
+    },
+    "figures/work2-mechanism/action-table.tex": {
+      "before": "58ba46489761dbc8cb08c81540a77d065e11bca7a217075f0a5789dc8723e4d3",
+      "after": "8e91b7cd9a27f4559a718e4e3c00afcb7b39f8a8514979ab0f5c8b2c7e36a364"
+    },
+    "figures/work2-mechanism/amplitude-table.tex": {
+      "before": "966065bae8775c40d402ae8f17a601d1ab0a53a7fde64f6af7b6a5aa0a6d9656",
+      "after": "28434cd8417bdd70ca7cfafaea596603d9838ce3e2802f1d30491b6abf1943ea"
+    },
+    "figures/work2-mechanism/features-table.tex": {
+      "before": "f0fce898c051494ee637f3ebdf1bde074f4de22615caa6204b9f6fb9e1a20fc4",
+      "after": "d73b67a5d47d150e26f7930408eed66b40a22eaf1fa039ed88a99093b70e2a7f"
+    },
+    "figures/work2-score-ablation/score-ablation-table.tex": {
+      "before": "44de798d3744e8baee93ff7c06c2eeb0ad51daacd42236293b7b4a6f1a5a4326",
+      "after": "274e805b4ca708c3d010ea1e968b2d6fab994a381248c9dac240ac84afdd2e47"
+    },
+    "figures/work2-semantic/training-validation-table.tex": {
+      "before": "b93ec3cc86f00db5a5bcd323cb2f7033ca39c10fe47afd67c50c905e0131bee5",
+      "after": "3e414a618d611e03a88dcb7fa17159d0d55d55f04272339d39d9c58c6d052e89"
+    },
+    "figures/work2-semantic/validation-table.tex": {
+      "before": "aa7f6bc18cdca3faf6523d348c6b76f8af0af5f9036a4afe729a8d01719c0451",
+      "after": "9a149ea3727631fce0158b817893b7791011e464333a7d005bc4d46689461727"
+    },
+    "figures/work2-structure/score-ablation-table.tex": {
+      "before": "5faa8d3f7fa0b91864464b9ddd7b5236871c59b5e8719be4d444c5714c04fd9e",
+      "after": "4dee89a1ed99efa8806f79ae10db0eda6aadc81cbb5530c95e7973db7e188da8"
+    },
+    "figures/work2-timing/timing-table.tex": {
+      "before": "5eeb3a436caa5ebb6cec6b3df69c75aac05a7fe0f2487fe17d1935ad0c2e57ac",
+      "after": "c94f25024ffd776df6721b50fc96a361d92bf1c270b0bad53835ca59054be673"
+    },
+    "figures/work2-training-repeats.tex": {
+      "before": "41b4bdbff5cfcd47d5c0509b686fd2501cc86293bc1d86c3aa73a3c6baf308a2",
+      "after": "7bbed215afdeb428ced28a8af2dd1554e0cce672c9f6ca694eff541a8d6deb58"
+    },
+    "chapters/05-final-test.tex": {
+      "before": "9ff15e4a0adbef5b75840cb9a3c7e468df65dc4db7545657cb8b70815d6b9ee1",
+      "after": "9eb0b09ab0de937addeb43639ff3646c861a8d99e747808c210c9bad35db487c"
+    },
+    "backmatter/final-supplement.tex": {
+      "before": "6487fa7ea4debf2a4a44643a10b358566d7906a703e2d1b572de4eb1fd54ac2d",
+      "after": "8c3268a875fea52bc3401f72a553e8983b404187c9dcddc205b64e597693574c"
+    },
+    "figures/work2-final/mechanism-table.tex": {
+      "before": "a5c403acdb308f9240512aae07a465dbf77d119a5ef729ce079bfc4975216f18",
+      "after": "b6298af53097e1da913340da9f11185446bbdc07aedca4b6f486516a840cc554"
+    },
+    "figures/work2-final/primary-table.tex": {
+      "before": "b9c07cff7b349d0bbb6f5bd3347fc628bc449d2615814ce9a1c8ffa23d741726",
+      "after": "268b6f8144d33cd7ec77acd02b764099b28ac22dabb48a959316ddfa03b2f5bc"
+    },
+    "figures/work2-final/tail-table.tex": {
+      "before": "2b6b4ed5f723eb0da6e3694b31b27a0d3118fee8b53cb4805b023ab735acf0ea",
+      "after": "18f250cc9c419acfb9a88da04b6e0d7908265ce8f56d980a01564dc474b47070"
+    },
+    "figures/work2-final/whole-table.tex": {
+      "before": "f66ea6aa35ef11e8229262606ec5c17fa143233e710ad2e73b765e1be395268f",
+      "after": "3860c2a2764778d48a62c318e73e9ffab7426dd2b1dac35dbff48ac4234c6c68"
+    }
+  },
+  "script_sha256": "9af8abbeaafe1860460860512ef22987a58727b6841d1b542da906d1b30d5907",
+  "floats_checked": 51
+}

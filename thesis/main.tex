@@ -1,0 +1,37 @@
+% !TeX program = XeLaTeX
+% !TeX encoding = UTF-8
+\documentclass[type=master]{YNUthesis}
+\usepackage{YNUlogo}
+\usepackage{booktabs}
+\usepackage{tikz}
+\input{metadata}
+\input{setup}
+\ifdefined\YNUAnonymous
+  \YNUsetup{info={author={},author*={},supervisor={\mbox{},副研究员}}}
+  \hypersetup{pdfauthor={},pdfsubject={硕士学位论文匿名写作预览}}
+\fi
+
+\begin{document}
+\raggedbottom
+\frontmatter
+\input{frontmatter/abstract}
+\tableofcontents
+\input{frontmatter/notation}
+
+\mainmatter
+\include{chapters/01-introduction}
+\include{chapters/02-foundations}
+\include{chapters/03-work1}
+\include{chapters/04-work2}
+\include{chapters/05-evaluation}
+\include{chapters/06-conclusion}
+
+\appendix
+\include{backmatter/appendix}
+\include{backmatter/development-history}
+\include{backmatter/final-supplement}
+\backmatter
+\printbibliography
+\input{backmatter/achievements}
+\input{backmatter/acknowledgements}
+\end{document}

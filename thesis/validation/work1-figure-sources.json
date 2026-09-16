@@ -1,0 +1,102 @@
+{
+  "archive": "/root/.codex/attachments/6a56392a-bbfb-4221-a468-2bc87e3cc4cb/Neighbor_Aware_Reinforcement_Learning_Fosters_Cooperation_in_Spatial_Public_Goods_Games.zip",
+  "archive_sha256": "b5639b4e5bbae0549a98c2395503c7ff7c65a6188c8bd1827a72575a027df230",
+  "tex_matches_workspace": true,
+  "figures": [
+    {
+      "file": "4_evolution_grid.png",
+      "bytes": 611586,
+      "sha256": "f8526625b65f45dbd3b9dff4ed4ebe65b4058778cccfc06a4dd8596f8ddcdbf2"
+    },
+    {
+      "file": "lattice_k0_t10000.png",
+      "bytes": 25618,
+      "sha256": "fd8e9303fbeb016d4b93721eb0e80dc17fbda7f9f4732ab61c12b7ec1a574e09"
+    },
+    {
+      "file": "lattice_k0_t1000.png",
+      "bytes": 24393,
+      "sha256": "dbf391bd7a42dde68dc16eacba3b43b7e172055b1149ca516eb27de3cbb362ef"
+    },
+    {
+      "file": "lattice_k0_t100.png",
+      "bytes": 36217,
+      "sha256": "996dd029f5cd7f087102ae4450222fad29210334c0149c25150ec2822d905ef1"
+    },
+    {
+      "file": "lattice_k0.5_t10000.png",
+      "bytes": 24144,
+      "sha256": "0ba1de75d39c3dd4b96d98f02e16cafe91749f0f6e5a512d68758162cc89dfdb"
+    },
+    {
+      "file": "lattice_k0.5_t1000.png",
+      "bytes": 22321,
+      "sha256": "3c20087ece5058e1c96d1e86410f0b908c2ed4c3563c1dbcd5961bb665ac468d"
+    },
+    {
+      "file": "lattice_k0.5_t100.png",
+      "bytes": 30893,
+      "sha256": "e774acdfce77db83db7f60273fb30cb82b2cd8bcf0fca448a9f1ca3e6b96f37f"
+    },
+    {
+      "file": "Figure_Reward_vs_Coop_SideBySide.pdf",
+      "bytes": 128322,
+      "sha256": "f75000fb1635d1390353be6c83eb75d2f36e431697340c90688137e4415abbac"
+    },
+    {
+      "file": "Figure_Coop_vs_Stability_Comparison.pdf",
+      "bytes": 131724,
+      "sha256": "db637eb8815663d07f8c3bca9c014d44ae077bf7e6c89cd679257e46bd72f176"
+    },
+    {
+      "file": "Figure_9.pdf",
+      "bytes": 63991,
+      "sha256": "d29aaec7a49c8e39a935577937798cd9aaf1723eddba62ce9c922e5a645f49cb"
+    },
+    {
+      "file": "Figure_8.pdf",
+      "bytes": 132471,
+      "sha256": "9ddec9748172fe3c12ab5a0c2e0491d3d3acd80095772bc63c21e33b6dfd2b4f"
+    },
+    {
+      "file": "Figure_7.pdf",
+      "bytes": 90448,
+      "sha256": "e9b002a9c5e95c76d2dfdc209694897cc9fe8194c99a72f6906ed87e089a30a6"
+    },
+    {
+      "file": "Figure_6.pdf",
+      "bytes": 191833,
+      "sha256": "601a9b5374c1b2a90740786f8aa8ea682a5a37cdac75bfc88dde37667d7865ec"
+    },
+    {
+      "file": "Figure_4.pdf",
+      "bytes": 200728,
+      "sha256": "88b38433ad210b019b90b6aed51e235f0d82289199955d7963292d3d3bd55ee3"
+    },
+    {
+      "file": "Figure_2.pdf",
+      "bytes": 316083,
+      "sha256": "d7b86811dd7d3587388876a0dd75b044d6ab0d25215ab10299745286033bf274"
+    },
+    {
+      "file": "Fig5b.pdf",
+      "bytes": 58246,
+      "sha256": "571adcd7eea28d55b433f41f1c27fde13f6e599cc6283fe1f4effa27478f43d0"
+    },
+    {
+      "file": "Fig5a.pdf",
+      "bytes": 57808,
+      "sha256": "d62c9cfaf86acc6e7d12ce71adeeb4e76663862f81462cf9abc03278922de28e"
+    },
+    {
+      "file": "Fig1b.pdf",
+      "bytes": 90534,
+      "sha256": "3fc2d4c4cfbd286fc110e5868f68ea44eb24b9317084f0f5519790c20299a475"
+    },
+    {
+      "file": "Fig1a.pdf",
+      "bytes": 86185,
+      "sha256": "734f170eac3926661e6f0dce149a3ad4ad25c346141ecf2dea3f1f3539ae6c6a"
+    }
+  ]
+}

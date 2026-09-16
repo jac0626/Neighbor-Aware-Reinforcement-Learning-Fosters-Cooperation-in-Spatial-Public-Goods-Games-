@@ -1,0 +1,16 @@
+% Vector diagram of one receiver's NI update; all arrows follow implemented timing.
+\begin{tikzpicture}[font=\small,>=stealth,
+ box/.style={draw,rounded corners=2pt,align=center,minimum height=1.0cm,text width=4.7cm},
+ wide/.style={box,text width=8.0cm}]
+\node[box] (own) at (-3.0,0) {自身动作与真实奖励\\经验预测及TD更新后的Q表};
+\node[box] (msg) at (3.0,0) {候选邻居报告\\$\{(\widehat a_j,\widehat R_j):j\in\Omega'_i\}$};
+\node[wide] (feature) at (0,-1.8) {构造五维消息特征 $x_{ij}$\\计算局部归一化量 $D_i$ 与Q值接近量 $u_i$};
+\node[wide] (score) at (0,-3.4) {共享评分：$z_{ij}=w^{\mathsf T}x_{ij}$\\选取参考对象 $j_i^*$，精确并列时均匀选择};
+\node[wide] (gate) at (0,-5.0) {连续门控：$g_i=\sigma(b+v^{\mathsf T}x_{i,j_i^*}+v_u u_i)$\\正奖励优势决定是否产生附加修正};
+\node[wide] (update) at (0,-6.6) {将带动作一致性符号的 $\Delta Q_i$ 加入当前表项\\更新自身经验预测，进入下一轮在线学习};
+\draw[->] (own.south) -- (feature.north west);
+\draw[->] (msg.south) -- (feature.north east);
+\draw[->] (feature) -- (score);
+\draw[->] (score) -- (gate);
+\draw[->] (gate) -- (update);
+\end{tikzpicture}

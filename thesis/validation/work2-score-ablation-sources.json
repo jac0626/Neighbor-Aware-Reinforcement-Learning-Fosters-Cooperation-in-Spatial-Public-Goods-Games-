@@ -1,0 +1,19 @@
+{
+  "source_directory": "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/validation-cooperation-gate-20260915",
+  "purpose": "matched model-selection data, not final test",
+  "source_files": {
+    "manifest.json": "3c8d2a7d77d5a5ba4b351c874bbd92fe784980a368f1dd711fcace90cd341944",
+    "selection.json": "e3c04f0398e34e68a5a740b86b96c51f9d2d69305df7d2bf0645c96325f033f0",
+    "summary.csv": "ff8eb32f3c91bb142111e79670356d2b8be0b11de91c73297e80bfea6c240877",
+    "score-ablation.json": "5be4f231f49d82a867522ebe7de603c19c22b76477e7616b45c1b29ae91b2660"
+  },
+  "exported_files": {
+    "score-ablation.pdf": "1e8bebf4318c725b6e88ad4bf69d3d7bd8c75691690fa8d1f0c9d7dec48f5949",
+    "score-ablation-table.tex": "274e805b4ca708c3d010ea1e968b2d6fab994a381248c9dac240ac84afdd2e47"
+  },
+  "before_source_typesetting": {
+    "score-ablation-table.tex": "44de798d3744e8baee93ff7c06c2eeb0ad51daacd42236293b7b4a6f1a5a4326"
+  },
+  "source_typesetting_script_sha256": "9af8abbeaafe1860460860512ef22987a58727b6841d1b542da906d1b30d5907",
+  "source_typesetting_note": "Source credits moved below floats; data rows and artwork unchanged."
+}

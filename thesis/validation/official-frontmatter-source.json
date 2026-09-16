@@ -1,0 +1,13 @@
+{
+  "checked_date": "2026-09-15",
+  "college_notice": "https://www.sei.ynu.edu.cn/info/1057/2662.htm",
+  "current_official_listing": "http://www.grs.ynu.edu.cn/xwgz/qrzssxwsy.htm",
+  "frontmatter_page": "http://www.grs.ynu.edu.cn/info/1035/3644.htm",
+  "frontmatter_page_published": "2021-05-08",
+  "attachment_name": "附件3：扉页-硕士.docx",
+  "attachment_url": "http://www.grs.ynu.edu.cn/system/_content/download.jsp?urltype=news.DownloadAttachUrl&owner=1344356562&wbfileid=6451193",
+  "page_sha256": "0a8dbb8833ee11ce56b15435c78475e33de79557ff3b9fdb5e794c73025e6cdd",
+  "download_response_sha256": "40bc5bca756b97099f9c3e9cb0bcc29ae854dfbcabdd56cdbcdea17e654304fa",
+  "status": "official listing and page accessible over HTTP; attachment returns HTML asking for a verification code; DOCX not obtained",
+  "interpretation": "The form is currently linked from the graduate school listing; publication in 2021 alone neither proves obsolescence nor verifies its content. No comparison with the current LaTeX form is yet possible."
+}

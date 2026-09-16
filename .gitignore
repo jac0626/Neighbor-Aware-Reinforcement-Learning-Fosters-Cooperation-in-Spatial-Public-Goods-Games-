@@ -5,3 +5,5 @@
 **/*.py[cod]
 
 pure_dqn_spgg/vanilla_dqn_spgg/results/
+
+.venv-thesis/

@@ -1,0 +1,25 @@
+{
+  "source_directory": "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/validation-semantic-20260915",
+  "purpose": "validation/model-selection data, not final test",
+  "selected_candidate": "3100-last_generation_best",
+  "source_files": {
+    "manifest.json": "a57332b1e4bdc4810baa3f4beebcaf94211111da1834d009ef3c227601a038da",
+    "selection.json": "bda0e80365f15ec2ee56011dd3dfdd339420b2a02005166ccd0b890ca046d115",
+    "summary.csv": "68713c388ae2c781f97c5a64acc6130c6dfa6e050a428b64212974cbee694d29",
+    "trajectories.pdf": "8751b2a5376ab3d7268ea027e1ab6a6cc833c5f6a9e8623c427defa5f81c6274",
+    "snapshots.pdf": "a9d33c965edf904b42fd0592a29e110778e73aacf99173273e87b6a9d899d443"
+  },
+  "exporter_sha256": "d14e119270ff9c3436ea48f969bb3e845915d22a0421158539db8dfc8cb1ce6c",
+  "exported_files": {
+    "training-validation-table.tex": "3e414a618d611e03a88dcb7fa17159d0d55d55f04272339d39d9c58c6d052e89",
+    "trajectories.pdf": "8751b2a5376ab3d7268ea027e1ab6a6cc833c5f6a9e8623c427defa5f81c6274",
+    "validation-table.tex": "9a149ea3727631fce0158b817893b7791011e464333a7d005bc4d46689461727",
+    "snapshots.pdf": "a9d33c965edf904b42fd0592a29e110778e73aacf99173273e87b6a9d899d443"
+  },
+  "before_source_typesetting": {
+    "training-validation-table.tex": "b93ec3cc86f00db5a5bcd323cb2f7033ca39c10fe47afd67c50c905e0131bee5",
+    "validation-table.tex": "aa7f6bc18cdca3faf6523d348c6b76f8af0af5f9036a4afe729a8d01719c0451"
+  },
+  "source_typesetting_script_sha256": "9af8abbeaafe1860460860512ef22987a58727b6841d1b542da906d1b30d5907",
+  "source_typesetting_note": "Source credits moved below floats; data rows and artwork unchanged."
+}

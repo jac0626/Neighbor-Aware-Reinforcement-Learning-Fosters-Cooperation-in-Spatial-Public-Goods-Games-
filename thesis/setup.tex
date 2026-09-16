@@ -1,0 +1,42 @@
+% 中文使用 TeX Live 的 Fandol 字体，西文优先使用本机 Times New Roman。
+% FandolSong 为宋体字族；无 Times New Roman 时使用 XITS 预览。
+\YNUsetup{
+  style = {
+    font = times,
+    cjk-font = fandol,
+    font-size = -4,
+    hyperlink = none,
+    bib-backend = bibtex,
+    bib-style = numerical,
+    bib-resource = {references.bib}
+  }
+}
+
+% 本机使用学校指定的西文字体；仅有TeX Live的环境保持原XITS预览。
+% 字体文件不随论文源码包分发，来源与文件散列见validation/latin-font-source.json。
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{}
+
+% geometry 的 head/foot 表示页眉高度和页脚基线偏移，不是距纸边距离。
+% 保留正文边距；按实际PDF文字边界校准，使页眉上沿、页脚下沿分别
+% 距纸边约1.6cm、1.5cm。核验记录见validation/page-layout.json。
+\geometry{headsep=0.94cm,footskip=0.92cm}
+
+% 使用模板既有封面接口做两项局部适配，保持上游类文件不变。
+% 上游封面忽略 info/date 而直接打印编译年月；此处改为使用配置值。
+% Fandol 不含上游封面调用的行楷字族，骨架封面使用同套字体中的楷体。
+\ExplSyntaxOn
+\EditInstance { YNU / cover } { cover-i-default }
+  {
+    date / content = \l__YNU_info_date_tl,
+    type / format = \zihao { 0 } \use:c { YNU@kai },
+    degree / content = \clist_item:Nn \c__YNU_degree_type_clist { \l__YNU_info_degree_type_int }
+  }
+\ExplSyntaxOff
+
+% 封面标题的人工换行不进入PDF标题元数据。
+\AddToHook{package/hyperref/after}{
+  \pdfstringdefDisableCommands{\def\\{}}
+}
+\hypersetup{
+  pdfsubject = {硕士学位论文写作稿}
+}

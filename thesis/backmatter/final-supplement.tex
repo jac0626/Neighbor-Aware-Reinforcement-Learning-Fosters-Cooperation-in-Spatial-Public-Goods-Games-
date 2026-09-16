@@ -1,0 +1,30 @@
+\chapter{最终测试的补充结果}
+\label{app:final-supplement}
+
+本附录保留与第五章相同1200次留出测试对应的末段完整表、全程逐次分布和预定空间快照，不新增运行，也不增加主要统计比较。每种方法与环境均包含1000至1029号30个种子。
+
+\input{figures/work2-final/tail-table.tex}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/work2-final/distributions-whole.pdf}
+\caption{最终测试全部独立运行的全程合作。每个点对应一次100000步运行，黑色竖线为均值；纵向偏移仅用于分辨点。}
+\label{fig:app-final-whole}
+\par\smallskip{\zihao{-5}\rmfamily 来源：作者，本文冻结后的留出测试，每个条件30次独立运行，2026年。\par}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/work2-final/primary-differences.pdf}
+\caption{八项主要比较的均值差与配对bootstrap区间。单位为百分点，差值方向为完整模型减去对照；黑色细线为95\%区间，蓝色粗线为对八项比较校正后的99.375\%近似区间。精确数值见表\ref{tab:w2-final-primary}。}
+\label{fig:app-final-intervals}
+\par\smallskip{\zihao{-5}\rmfamily 来源：作者，本文冻结后的留出测试，每个条件30次独立运行，2026年。\par}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=.88\linewidth]{figures/work2-final/snapshots-r4.4.pdf}
+\caption{最终测试中同一预定种子1000的末轮真实动作，$r=4.4$、10\%持续失真。蓝色表示合作，灰色表示背叛；数值为末轮比例，与最后20\%窗口的均值不同。}
+\label{fig:app-final-snapshot}
+\par\smallskip{\zihao{-5}\rmfamily 来源：作者，本文冻结后的留出测试，每个条件30次独立运行，2026年。\par}
+\end{figure}

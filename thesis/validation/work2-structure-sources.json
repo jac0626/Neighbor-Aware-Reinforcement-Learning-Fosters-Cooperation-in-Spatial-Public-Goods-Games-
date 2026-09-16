@@ -1,0 +1,22 @@
+{
+  "source_directory": "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/validation-structure-20260915",
+  "purpose": "four-family model-selection validation, not final test",
+  "source_files": {
+    "manifest.json": "27e8d1cd1cb9c772f0af28c80bca879f5805936f3b0734f1ad8bd9069e9d1f80",
+    "selection.json": "ac656fcc74e1ae1985eeb30324c9142d471d6b1ec03998f1ab1e0afc865f7aa3",
+    "summary.csv": "5ccbebebfc459b6eaa94e1b4fd0d0c7580bf008eb4a814dde919b5e521140246",
+    "score-ablation.json": "18680b16545a8444525d7a73083ce8109a0c348b0f923e48be0fca5db395e1de",
+    "score-ablation-table.tex": "5dacdfe05e23a6d94288bdce747d24beb9c0b14745168d4d166d48ec58ff54a2",
+    "score-ablation.pdf": "d22807601aa9176d957f3f824c451397a4a902ae68e8bc0faf58572051fe6252"
+  },
+  "exported_files": {
+    "score-ablation.pdf": "d22807601aa9176d957f3f824c451397a4a902ae68e8bc0faf58572051fe6252",
+    "score-ablation-table.tex": "4dee89a1ed99efa8806f79ae10db0eda6aadc81cbb5530c95e7973db7e188da8"
+  },
+  "transformation": "Only table label changed to tab:w2-structure-ablation to avoid a duplicate LaTeX label.",
+  "before_source_typesetting": {
+    "score-ablation-table.tex": "5faa8d3f7fa0b91864464b9ddd7b5236871c59b5e8719be4d444c5714c04fd9e"
+  },
+  "source_typesetting_script_sha256": "9af8abbeaafe1860460860512ef22987a58727b6841d1b542da906d1b30d5907",
+  "source_typesetting_note": "Source credits moved below floats; data rows and artwork unchanged."
+}

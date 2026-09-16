@@ -1,0 +1,12 @@
+\begin{tikzpicture}[scale=0.82]
+ \draw[gray!35,step=1] (-2.5,-2.5) grid (2.5,2.5);
+ \foreach \x/\y in {2/0,-2/0,0/2,0/-2,1/1,1/-1,-1/1,-1/-1}
+   \node[circle,draw,dashed,fill=white,minimum size=7mm] at (\x,\y) {2};
+ \foreach \x/\y in {1/0,-1/0,0/1,0/-1}
+   \node[circle,draw,fill=gray!20,minimum size=7mm] at (\x,\y) {1};
+ \node[circle,draw,thick,fill=gray!55,minimum size=7mm] at (0,0) {$i$};
+ \node[anchor=west,align=left,font=\small] at (3.1,1.2) {博弈组：中心 $i$ 与四个一阶邻居};
+ \node[anchor=west,align=left,font=\small] at (3.1,0.2) {$M=1$：自身 $+$ 4个一阶邻居};
+ \node[anchor=west,align=left,font=\small] at (3.1,-0.8) {$M=2$：再加入8个二阶邻居};
+ \node[anchor=west,align=left,font=\small] at (3.1,-1.8) {参考对象：从感知集合中排除自身};
+\end{tikzpicture}

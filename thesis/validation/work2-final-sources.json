@@ -1,0 +1,97 @@
+{
+  "verified_runs": 1200,
+  "source_path": "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/final-test-20260915",
+  "source_sha256": "62f789ab6fc2dc20ff66b12a3897c575c110e666f28efa8b362d12663064b19a",
+  "snapshot_selection": "smallest held-out seed 1000, fixed before test",
+  "snapshots": [
+    {
+      "r": 4.4,
+      "rho": 0.1,
+      "label": "3100-last_generation_best",
+      "seed": 1000,
+      "run": 30,
+      "final_action_cooperation": 0.9711111111111111
+    },
+    {
+      "r": 4.4,
+      "rho": 0.1,
+      "label": "3202-last_generation_best",
+      "seed": 1000,
+      "run": 150,
+      "final_action_cooperation": 0.9633333333333334
+    },
+    {
+      "r": 4.4,
+      "rho": 0.1,
+      "label": "ni_global-0.5",
+      "seed": 1000,
+      "run": 630,
+      "final_action_cooperation": 0.0077777777777777776
+    },
+    {
+      "r": 4.4,
+      "rho": 0.1,
+      "label": "cooperation_first-0.2",
+      "seed": 1000,
+      "run": 990,
+      "final_action_cooperation": 0.9266666666666666
+    },
+    {
+      "r": 4.8,
+      "rho": 0.1,
+      "label": "3100-last_generation_best",
+      "seed": 1000,
+      "run": 90,
+      "final_action_cooperation": 0.99
+    },
+    {
+      "r": 4.8,
+      "rho": 0.1,
+      "label": "3202-last_generation_best",
+      "seed": 1000,
+      "run": 210,
+      "final_action_cooperation": 0.9866666666666667
+    },
+    {
+      "r": 4.8,
+      "rho": 0.1,
+      "label": "ni_global-0.5",
+      "seed": 1000,
+      "run": 690,
+      "final_action_cooperation": 0.08555555555555555
+    },
+    {
+      "r": 4.8,
+      "rho": 0.1,
+      "label": "cooperation_first-0.2",
+      "seed": 1000,
+      "run": 1050,
+      "final_action_cooperation": 0.94
+    }
+  ],
+  "exporter_sha256": "fc3d9946e69139072ce39bcc57fbe93768e200f083d4989b722f41132dcfe299",
+  "artifacts": {
+    "snapshots-r4.8.png": "49affd4bb0aa1291d1ca25cd7282814fb6b3ab0d1d85aaeb70d9c4dd6b79e45b",
+    "snapshots-r4.4.pdf": "c8d077da7ce16025288ec05bdf9acbbaf611fd0ef6b8288eb8c222206f212f07",
+    "trajectories.pdf": "867d8cc2b3cf59274847aea8aa43a7aa77aeac59ce70cc946698062278438c17",
+    "snapshots-r4.8.pdf": "4fe2960cfd1d9e9a760432d32651028be3991f9ac44ec66bcee7dfd4582ec1d7",
+    "distributions-tail.png": "4e0cc27b4ddbed2c7d20c6cb635c8b9175bfaa2e084e9c9a1fa1c8953e95630a",
+    "whole-table.tex": "3860c2a2764778d48a62c318e73e9ffab7426dd2b1dac35dbff48ac4234c6c68",
+    "tail-table.tex": "18f250cc9c419acfb9a88da04b6e0d7908265ce8f56d980a01564dc474b47070",
+    "distributions-tail.pdf": "3ea4a05a87e8421bc123a1c51df9950a09e913ae3693661b2ef4df3ae997dbd8",
+    "trajectories.png": "081d342b597f081f68ac629deb3900d726a33f89e1355239ea35dca118277226",
+    "primary-differences.png": "ecf2d633e4b400b015313f009d1527a620aae63021bf6486a2641c134b2fbaab",
+    "distributions-whole.png": "ffe7ec71e01307cdc1af6c142e821107c7f1cfe722044c8b4bd4072c411d8ba5",
+    "snapshots-r4.4.png": "70fab99d7fe07fec8f5ce07979f756dfafa8f5538221bdae4c84770e2300fb4f",
+    "primary-differences.pdf": "bd8463d1f5607e3b81434eb22c4f3f6eeb824724474e205290c3260b3a0c586f",
+    "distributions-whole.pdf": "5ea6754e58f874bf5c4aafa8198baf0da2d03d8b227d9d4ad4133f63d3b468a3",
+    "primary-table.tex": "268b6f8144d33cd7ec77acd02b764099b28ac22dabb48a959316ddfa03b2f5bc"
+  },
+  "before_source_typesetting": {
+    "whole-table.tex": "f66ea6aa35ef11e8229262606ec5c17fa143233e710ad2e73b765e1be395268f",
+    "tail-table.tex": "2b6b4ed5f723eb0da6e3694b31b27a0d3118fee8b53cb4805b023ab735acf0ea",
+    "primary-table.tex": "b9c07cff7b349d0bbb6f5bd3347fc628bc449d2615814ce9a1c8ffa23d741726"
+  },
+  "source_typesetting_script_sha256": "9af8abbeaafe1860460860512ef22987a58727b6841d1b542da906d1b30d5907",
+  "source_typesetting_note": "Source credits moved below floats; data rows and artwork unchanged."
+}

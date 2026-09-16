@@ -1,0 +1,19 @@
+\begin{abstract}
+空间公共物品博弈中，合作个体承担成本，产生的收益却由周围成员共享，个体强化学习因而面临即时利益与群体合作之间的矛盾。邻居经验可以提供额外参考，但接收端看到的动作和奖励报告未必真实。围绕这一问题，本文研究局部社会信息如何参与多智能体强化学习，以及消息失真后如何选择参考对象并控制其影响。
+
+在可靠信息条件下，提出邻居感知价值修正方法：保留标准Q-learning的时序差分更新，根据参考邻居的相对综合奖励与动作一致性，对自身已执行动作的Q值施加附加修正。已发表实验表明，适当引入邻居影响能够改变合作轨迹并促进合作恢复，其作用受感知范围、影响强度和奖励组成共同影响。
+
+在不可靠信息条件下，构造基于局部消息与自身经验的线性评分器和连续门控，分别决定参考对象及附加更新幅度。控制器通过完整仿真进行交叉熵参数搜索，执行时共享参数保持固定，个体Q表仍从头在线学习。进一步推导消息动作对合作价值差的作用方向、单步修正幅度界和有界奖励下的Q值范围，区分行为引导、数值有界与长期合作保证。
+
+冻结参数后的1200次测试覆盖两个协同因子、干净与持续虚假高奖励背叛报告条件，每种方法每个条件使用30个独立环境种子。完整模型在两个受扰条件的全程合作率分别为0.96774和0.98398；在四个条件中，相对已调固定合作规则提高4.105至5.255个百分点，这四项差值在八项主要比较校正后的区间均为正。固定合作评分加学习门控已解释大部分提升，学习评分仅在部分条件提供增量，且存在干净性能代价。特征移除表明，当前参数依赖显式合作语义；泛化开发也揭示了低协同因子、高异常比例及较小感知范围下的限制。本文据此将方法定位为具有明确适用范围的任务相关信息控制，不将高合作等同于普遍的消息真假识别。
+\end{abstract}
+
+\begin{abstract*}
+In spatial public goods games, cooperators bear costs while sharing benefits with nearby individuals. This creates a tension between immediate individual interests and collective cooperation. Neighbors' experience offers additional information, but their reported actions and rewards may be unreliable. This thesis investigates how local social information enters multi-agent reinforcement learning and how reference selection and influence should change when messages are distorted.
+
+For reliable information, neighbor-aware value correction supplements standard Q-learning using a reference neighbor's relative composite reward and action agreement. Published experiments show that the correction can promote cooperation recovery under the investigated conditions, with effects depending on perception range, influence strength, and reward composition.
+
+For unreliable information, a linear scorer selects a reference from local messages, and a continuous gate controls the additional update using the receiver's own experience. Shared parameters are optimized through cross-entropy search over complete simulations. During evaluation, these parameters remain fixed while individual Q-tables learn online from scratch. Analysis establishes the correction direction, a single-step magnitude bound, and a Q-value range under bounded rewards, distinguishing behavioral guidance and bounded values from long-term cooperation guarantees.
+
+The frozen models are evaluated in 1,200 runs covering two synergy factors and clean or persistent false high-reward defection reports, with 30 independent environment seeds per method and condition. The full controller achieves whole-trajectory cooperation of 0.96774 and 0.98398 in the two faulty conditions. Across all four conditions, it exceeds a tuned fixed cooperative rule by 4.105--5.255 percentage points; the corresponding intervals adjusted over eight primary comparisons remain positive. A learned gate with fixed cooperative scoring accounts for most of the improvement. Learned scoring adds benefits only in some conditions and incurs a clean-performance cost. Feature removal shows dependence on explicit cooperative semantics, while development experiments identify limitations under lower synergy, higher fault fractions, and smaller perception ranges. These findings support task-oriented information control within explicit limits, rather than general identification of truthful messages.
+\end{abstract*}

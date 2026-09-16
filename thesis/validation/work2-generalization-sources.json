@@ -1,0 +1,48 @@
+{
+  "purpose": "frozen-controller development generalization, not final test",
+  "sources": {
+    "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/generalization-messages-20260915": {
+      "manifest.json": "3b2a3bb2a5f9ed130e4ed52a277c5f7d7884978de2d7665abbbabf74cb234f5e",
+      "summary.csv": "6e9eeadf57c2d0861996f064454b61d3f4af740256f3bc3114bbc1a7b14c4215",
+      "generalization.json": "0560b437485cf00442fc103196fe6a5b09735198c8021b9b763a1a40315e3430"
+    },
+    "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/generalization-parameters-20260915": {
+      "manifest.json": "572ac76fe1be600ba9397c081646b5a547d719261428020f5fd0ea43e2eadccd",
+      "summary.csv": "e3bbe4af7f92771d63708c02216ccb788c14ea63421784ef9d1e46fc7fd78c9b",
+      "generalization.json": "09ac28dd8a6850999c2ff861503c7b44ca09dc0cd3fe0df58001d18166d508ca"
+    },
+    "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/generalization-state-20260915": {
+      "manifest.json": "b40f1dda0d78ba598a0bb40cba891a7d7b63f284019ee453488e3a004744f111",
+      "summary.csv": "66136e63b6c1eab15635683b2c0a3e4b7dc70a38d0ff2a232aa074a70a3d656f",
+      "generalization.json": "9b7f9af4e431837136dc7c4447cdb5c9213740d1ed83d7f04f7fada5aa850071"
+    },
+    "/root/Neighbor-Aware-Reinforcement-Learning-Fosters-Cooperation-in-Spatial-Public-Goods-Games-/work2/results/generalization-scale-20260915": {
+      "manifest.json": "fef207a7e65a2b8091c7b05bb3c740cb1a742683ce4927c06bfd2c0d402ae31a",
+      "summary.csv": "6371ce466367454cf5accb6c99f4c567fd97c7b2f26844f2c00b3bc30263d349",
+      "generalization.json": "d6de4c0f35400da61f90579087542dfe9a1864256cb1b3ebcdcc0ea381be0ad8"
+    }
+  },
+  "exporter_sha256": "766e529785a8499c5f607d31a57a80683064b9d1b71b64a13ceff60bf3c26d75",
+  "exported_files": {
+    "state.png": "34616ff755611373e4e17768a202747ff9f19927be5504a4de40d3d3a3aeb9b3",
+    "parameter-boundaries-table.tex": "66af9d84bce98d4a721278444ce51d7d67190adcb1827240edf903b05ba2b182",
+    "parameters.pdf": "6a4babdf6982f71bced7b9ab001f35329073118401797a4d752a7b33db756557",
+    "scale.png": "229ee2d783388bf2686b4f55df240b5e39fa69bc120fd29f8339a83b43a1b6a7",
+    "parameters.png": "a031858465a61d91c513613d411549f0b474d3bd9be8a2c2805d77179159f2a8",
+    "messages.png": "b3ca9a0cd1cb1c84087477d6929e62e37fd3f335b4e9f99afbea51568655560f",
+    "messages.pdf": "782f80f2cea53f7554b656eb91f13a3b37a92953065a21215b14de1902aed30a",
+    "state.pdf": "fa3c45c9264b2e8745f6dedd600145f51f04a26b65569047cdcc183e8f9fbfe8",
+    "messages-table.tex": "4cd4a9b30fd63ccf664c7d6c27954bd98aaedb285a44fb926f0604b63e2eb80a",
+    "scale.pdf": "e3b119a4401c005334362f731b65c13178cc42bb67f2a5e5d966926d01925fef",
+    "state-table.tex": "6d331edfb2233ae795c6cf06f970918f5d71ecbf7f268040b3263599cd1bf818",
+    "scale-table.tex": "4dd79f434232f410bf59c6160d00ef206db520800bffa651c6657af45335adaf"
+  },
+  "before_source_typesetting": {
+    "parameter-boundaries-table.tex": "1e686f3bc1af4ae536d77793351753755336afe8308477a341433d13ac9c996f",
+    "messages-table.tex": "5633579736d7dc17eb207c2254446d58c1f44e753838aa464a037dcfef1dea8e",
+    "state-table.tex": "01535a31e69757a69779610445a2f317ed9206746135e8857d8ba7ce76e9407d",
+    "scale-table.tex": "2c66e176de1db05edf9aa5580406316454f72230f3c39a9237247d652e9b531e"
+  },
+  "source_typesetting_script_sha256": "9af8abbeaafe1860460860512ef22987a58727b6841d1b542da906d1b30d5907",
+  "source_typesetting_note": "Source credits moved below floats; data rows and artwork unchanged."
+}

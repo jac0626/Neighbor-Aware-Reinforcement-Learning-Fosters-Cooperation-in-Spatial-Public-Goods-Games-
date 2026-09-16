@@ -1,0 +1,7 @@
+{
+  "source": "https://ctan.org/pkg/fandol",
+  "main_pdf_sha256": "659e3aeef75bc39798d5a43072264463fb64a7ed16bf9c153b133327bf5a3364",
+  "body_sample_physical_page": 15,
+  "pdffonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nREENYM+FandolHei-Regular-Identity-H  CID Type 0C       Identity-H       yes yes no      15  0\nGSXJFF+TeXGyreHeros-Regular-Identity-H CID Type 0C       Identity-H       yes yes yes     17  0\nJRYMRO+FandolSong-Regular-Identity-H CID Type 0C       Identity-H       yes yes no       5  0\nJGUKHG+TimesNewRomanPSMT             CID TrueType      Identity-H       yes yes yes      7  0\n",
+  "interpretation": "FandolSong is the Song-style body font. The retrieved school rule does not specify SimSun or a font vendor."
+}
