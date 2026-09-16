@@ -1,6 +1,6 @@
 # 云南大学硕士学位论文工程
 
-当前为107页完整研究稿，已写入工作1原图、工作2模型、开发检验及1200次最终留出测试。摘要和总结已依据最终数据更新；研究方向、提交年月及新版扉页仍有待定项，当前文件用于导师评阅。
+当前源码已完成一轮论文论证与表达修订，工作1原图、工作2模型、开发检验及1200次最终留出测试均保持不变。2026-09-15核验过的上一编译快照为107页；2026-09-16完成正文与摘要修订后，当前源码尚未重新执行完整 `latexmk main.tex` / `latexmk anonymous.tex`，因此 `build/` 中PDF、源码ZIP及对应编译散列暂视为上一已验证快照，不应当作当前源码的最新构建结果。研究方向、提交年月及新版扉页仍有待定项，当前文件用于导师评阅。
 
 ## 研究范围与当前材料
 
@@ -8,10 +8,10 @@
 
 工作1保持已出版的Neighbor-aware reinforcement learning研究；工作2按作者授权重新设计，研究不可靠邻居消息下的参考选择与价值修正控制。中期汇报仅提供动机，早期双脑架构与无原始数据的汇报数字均未作为研究结果。
 
-- `build/main.pdf`：完整写作稿。
-- `build/anonymous.pdf`：匿名写作预览，隐去封面、致谢与成果中的本人及导师姓名，保留学号与职称；参考文献作者按正常学术引用保留。
-- `build/work1-preview.pdf`：17页工作1单章预览，含文献。
-- `build/thesis-source.zip`：论文工程快照；更新状态以其中源码和`build/source-package-verification.json`为准。
+- `build/main.pdf`：上一已验证完整写作稿；当前源码修订后需重新生成。
+- `build/anonymous.pdf`：上一已验证匿名写作预览；当前源码修订后需重新生成并复核匿名字段。
+- `build/work1-preview.pdf`：17页工作1单章预览，含文献，未随本轮全文文字修订重新生成。
+- `build/thesis-source.zip`：上一已验证论文工程快照；当前分支源码更新后需重新打包并刷新`build/source-package-verification.json`。
 - `PROGRESS.md`：当前验收进度；实验状态以各批`completion.json`和审计文件为准。
 
 ## 已确认信息与待定字段
@@ -44,14 +44,14 @@ tlmgr install xetex latexmk ctex xecjk fandol fontspec unicode-math geometry fan
 
 工作1压缩包的19个原始图片文件保持不变，18个图文件按11组结果图接入，另绘制模型示意图。文件散列、图文解释及旧脚本差异见`validation/work1-figure-sources.json`和`validation/work1-audit.md`。缺少原论文逐次运行数据和确切稳态窗口时，不补造误差条或数值复现结论。
 
-工作2代码、协议、原始数据和各批源码快照位于项目`work2/`。基线、四类模型同预算训练、512次共同结构验证、1152次泛化、实际更新幅度校准及特征移除已完成。1200次留出测试已按`work2/FINAL_TEST_PROTOCOL.md`完成并审计，60次公平开销按`work2/TIMING_PROTOCOL.md`完成并通过核验。论文图表与相应数据的散列对应保存在`validation/work2-*-sources.json`。源码ZIP只包含论文工程，实验数据另行归档。
+工作2代码、协议、原始数据和各批源码快照位于项目`work2/`。基线、四类模型同预算训练、512次共同结构验证、1152次泛化、实际更新幅度校准及特征移除已完成。1200次留出测试已按`work2/FINAL_TEST_PROTOCOL.md`完成并审计，60次公平开销按`work2/TIMING_PROTOCOL.md`完成并通过核验。论文图表与相应数据的散列对应保存在`validation/work2-*-sources.json`。本轮只调整论文论证与表达，没有改动实验代码、原始数据或这些结果图表。
 
 ## 模板来源与格式边界
 
 上游：[Astro-Lee/YNUthesis](https://github.com/Astro-Lee/YNUthesis)，固定版本`0842a7fe974de05bd2110db267e7a077a0e20075`，取得日期2026-09-15。上游类文件、定义、标志、文献样式、dtx源文件和许可证保持不变；本地适配写在`setup.tex`。来源和许可证见`README.template.md`、`LICENSE.template`。
 
-本地适配使封面使用已配置日期、显示专业学位标识，并在Fandol环境下使用楷体；页眉、页脚已按实际PDF文字边界核验位置。本机已配置Times New Roman，英文摘要中的常规与粗体字形已核验为嵌入PDF的对应字体。未安装该字体的环境继续使用XITS预览，已通过独立编译检查。字体文件不随源码包分发，来源见`validation/latin-font-source.json`。中文正文使用已核验嵌入的FandolSong宋体；当前公开规范未指定宋体字库厂商。新版扉页及简况表也需取得学校原表核对。
+本地适配使封面使用已配置日期、显示专业学位标识，并在Fandol环境下使用楷体；页眉、页脚、字体嵌入和匿名字段的既有核验均对应2026-09-15的上一编译快照。当前源码重新编译后，需要再次检查Times New Roman/Fandol字体、页眉页脚、图表浮动、引用、匿名封面和PDF元数据。新版扉页及简况表也需取得学校原表核对。
 
 依据：[云南大学基础写作规范](https://office.ynu.edu.cn/info/1080/1701.htm)、[学院2026年秋季学位授予通知](https://www.sei.ynu.edu.cn/info/1057/2662.htm)。用户毕业批次未定，通知截止日期不直接作为用户提交日期。具体对应与未决项见`validation/format-audit.md`。
 
-当前完整稿与匿名预览均编译通过；最终日志无未定义引用、缺字或内容溢出，新增机制表格及匿名封面已目视检查。仍有模板ctexpatch非致命警告和部分underfull提示。编译成功仅证明工程可构建，不能代替最终内容审阅与学校格式核准。
+上一编译快照的完整稿与匿名预览均曾通过编译，日志未发现未定义引用、缺字或内容溢出，并完成匿名封面目视检查；这些结果不能自动继承到2026-09-16后的文字修订源码。当前源码在正式送审或重新打包前必须重新完整编译，并刷新PDF、日志、页数和源码包散列。
